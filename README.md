@@ -12,10 +12,10 @@ All contributions to `main` must be happen through a [pull request](https://docs
 
 When a branch is made, ensure it uses one of the prefixes listed below:
 
-- `feature/<short description of feature>` for all modifications to the codebase.
-- `bugfix/<short description of bug>` for all patches.
-- `hotfix/<short description of fix>` for any fix that needs to be applied to `main` quickly
-- `doc/<short description of what is being written>` for any modifications or additions to the documentation.
+- `feature/<short description of modification or enhancement to code>`
+- `bugfix/<short description of bug>`.
+- `hotfix/<short description of fix with immediate requirement>`
+- `doc/<short description of what documentation was added>` 
 
 ### Commits
 
@@ -26,3 +26,5 @@ In general, only the subject line is required. The subject line must start with 
 - `refactor <what was refactored>`
 - `impl[ement] <what feature was added>`
 - `build <what change to the build process was made>`
+- `test <what piece of code was tested>`
+- `fix <what was fixed, this includes changes to documentation or code>`
