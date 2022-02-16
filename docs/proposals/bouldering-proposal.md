@@ -1,4 +1,4 @@
-# Classification of Bouldering Climbing Grade using Advanced Machine Learning Techniques
+# Classification of Bouldering Climbing Grade using Neural Networks
 
 ## Motivation for Problem Proposal
 
@@ -11,13 +11,21 @@ To explore this challenging task, we would use climbing route data collected fro
 
 ## Related Works
 
+- Dobles et al. (2017) employed and evaluated Naives Bayes, softmax regression, and Convolutional Neural Network classifiers to attempt to determine the difficulty grade of climbing routes, specifically using a dataset collected from Moonboard.com to standardize the data. They yielded the following results for each classifier resepctively: 34.0% 36.5% 34.0%
+- Duh & Chang (2021) employed RNN architectures to explore classifying Moonboard climbing route grades and to generate new Moonbaord routes. Their 'GradeNet' architecture achieved 46.7% accuracy upon testing.
+- Tai et al. (2020) applied Graph Convolutional Neural Networks (GCN) architectures previously used in NLP applications to classifying the climbing route grade of Moonboard problem sets, with their top model achieving an average AUC score of 0.73 across all classes.
+
 Dobles, A., Sarmiento, J. C., & Satterthwaite, P. (2017). Machine learning methods for climbing route classification. Web link: https://cs229.stanford.edu/proj2017/final-reports/5232206.pdf
 
 Duh, Y. S., & Chang, R. (2021). Recurrent neural network for moonboard climbing route classification and generation. arXiv preprint arXiv:2102.01788.
 https://arxiv.org/pdf/2102.01788.pdf 
+
+Tai, C. H., Wu, A., & Hinojosa, R. (2020). Graph neural networks in classifying rock climbing difficulties. Technical report. Web link: http://cs230.stanford.edu/projects_winter_2020/reports/32175834.pdf
 
 Kempen, L. (2018). A fair grade: assessing difficulty of climbing routes through machine learning. Formal methods and tools, University of Twente. https://fmt.ewi.utwente.nl/media/30-TScIT_paper_46.pdf 
 
 Scarff, D. (2020). Estimation of Climbing Route Difficulty using Whole-History Rating. arXiv preprint arXiv:2001.05388. https://arxiv.org/pdf/2001.05388.pdf
 
 ## Our Planned Approach
+
+##
