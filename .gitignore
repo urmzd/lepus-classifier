@@ -9,4 +9,5 @@
 !**/*.pdf
 !**/*.tex
 !**/*.md
+!Dockerfile
 
