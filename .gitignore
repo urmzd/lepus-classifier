@@ -1,0 +1,12 @@
+# Ignore everything.
+*
+
+# Except directories
+!*/
+
+# Except for these files
+!.gitignore
+!**/*.pdf
+!**/*.tex
+!**/*.md
+
