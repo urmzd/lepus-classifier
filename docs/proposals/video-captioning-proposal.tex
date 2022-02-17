@@ -23,17 +23,21 @@ integration on video-streaming platforms such as Netflix and YouTube, through th
 closed captioning of videos. More specifically, given a short video clip, we propose a model which
 can generate a single sentence describing the events in the input.
 
+\newpage
 \section{Data Collection and Processing}
-In this project, we propose utilizing the dataset built for Deepmind Kinetic as a means of
-circumventing the collection of short video clips (~10s) and hence, reducing the complexity associated
+In this project, we propose utilizing the dataset designed for Deepmind Kinetic as a means of
+circumventing the collection of short video clips (\~10s) and hence, reducing the complexity associated
 with data collection. However, only a selective set of videos will be used to train and validate
 our model. To be specific, three videos from the each of the 700 classes will be selected, totalling
 to 2100 clips. The reason for the massive reduction in the dataset size is due to the additional labelling
 required for our specific use case. Deepmind Kenetic attempts to classify a video clip containing repetitive moments
-in one of 700 categories, wheras our model will attempt to generate a sentence describing the events occuring in the video.
-If the full dataset were to be used (~ 650,000) clips, there would be no time left to train the model. Additionally,
-our GPU resources are limited, and so, we do not have the capability to train models that require processing thousands of
-clips.
+in one of 700 categories, whereas our model will attempt to generate a sentence describing the events occuring in the video.
+If the full dataset were to be labelled (\~650,000 clips), there would be no time left to train the model given the current time
+constraints. Additionally, our GPU resources are limited, and so, we do not have the capability to train models
+that require extensive video processing.
+
+As mentioned earlier, the data collected requires extra processing. As the our model attempts to generate text to represent
+the events occuring within a video, each video must labelled with a reference sentence that generated sentences can be tested against.
 
 
 \end{document}
