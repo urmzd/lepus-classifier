@@ -8,6 +8,7 @@
 !.gitignore
 !**/*.pdf
 !**/*.tex
+!**/*.bib
 !**/*.md
 !Dockerfile
 
