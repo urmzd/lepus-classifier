@@ -9,6 +9,8 @@ With this project, we would explore predicting the climbing grade of Bouldering 
 ## Data 
 To explore this challenging task, we would use climbing route data collected from https://www.moonboard.com/. Moonboards are a standardized climbing wall made up of 142 rock holds on a 18x11 grid that are used for indoor bouldering training. Moonboard climbers utilize an app to load a problem route to the board, the sequence of holds marked by illuminated LEDs, so a large dataset of problems has been created by Moonboard and community users (over 30k problems were scraped by Duh & Chang in their 2021 work using RNN models for classication and route generation). 
 
+The Moonboard route can be effectively encoded as a {0, 1}^(18×11) matrix to serve as a graphical representation of the board, which can then be one-hot encoded (or multi-hot) to prepare the representation for input to the neural network.
+
 ## Related Works
 
 - Dobles et al. (2017) employed and evaluated Naives Bayes, softmax regression, and Convolutional Neural Network classifiers to attempt to determine the difficulty grade of climbing routes, specifically using a dataset collected from Moonboard.com to standardize the data. They yielded the following results for each classifier resepctively: 34.0% 36.5% 34.0%
