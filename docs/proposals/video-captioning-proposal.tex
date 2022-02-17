@@ -4,6 +4,7 @@
 \author[1]{Urmzd Mukhammadnaim \thanks{urmzd@dal.ca, B00800045}}
 \author[1]{Keelin Sekerka-Bajbus \thanks{kl967083@dal.ca, B00739421 }}
 \author[1]{Benjamin J. Macdonald \thanks{bn282348@dal.ca, B00803015}}
+\bibliographystyle{apa}
 
 \affil[1]{Faculty of Computer Science, Dalhousie University}
 \setcounter{secnumdepth}{0}
@@ -11,11 +12,11 @@
 \maketitle
 
 \section{Motivation}
-According to a meta-study done by Nucleus Research [cite], two-thirds
+According to a meta-study done by Nucleus Research \cite{nucleus research_2019}, two-thirds
 of online transactions are abandoned by blind individuals due to the lack of accessibility.
 Furthemore, approximately 36 million are said to have some degree of visual impairment, with the number
-expected to triple by 2050 according to a statistic by the World Health Organization.
-With a spending power of almost half a trillion dollars a year, providing accessibility
+expected to triple by 2050 according to a statistic by the World Health Organization \cite{world health organization_2021}.
+With a spending power of almost half a trillion dollars a year \cite{yin_smith_overton_shaewitz_2018}, providing accessibility
 as a service to individuals with disabilities is a untapped market that is by large, not catered to.
 Furthermore, as the pandemic has forced human interactions to be in large part, remote, accessibility is no longer
 a privilege, but a basic human right. This project proposes a tool to begin enabling better accessibility
@@ -29,7 +30,7 @@ can generate a single sentence describing the events in the input.
 In this project, we propose utilizing the dataset designed for Deepmind Kinetic as a means of
 circumventing the collection of video clips sharing similar contexts and hence, reducing the complexity associated
 with finding an appropriate datset. The Deepmind Kinetic 700 dataset contains 650,000 video clips collected from YouTube
-categorized in one of 700 different movement taxa. In our case, only a selective set of videos will be used to train and validate
+categorized in one of 700 different movement taxa \cite{DBLP:journals/corr/abs-2010-10864}. In our case, only a selective set of videos will be used to train and validate
 our model. To be specific, 600 videos from 3 random classes will be selected, totalling
 to 1800 clips. The reason for the massive reduction in the dataset size is due to the additional labelling
 required for our specific use case. Deepmind Kenetic attempts to classify a video clip containing repetitive moments
@@ -48,26 +49,30 @@ Videos will be clipped and labelled with a short description of the events that 
 to begin training.
 
 \section{Subproblems To Solve}
-We anticipate multiple subproblems we will have to address. One includes the creation of a model to evaluate the similarity of two 
-sentences for the purposes of quantifying the performance of our CNN-RNN model. With our previous experience utilizing word2vec, this 
-will be a problem we can quickly address. Other subproblems include determining the appropriate architecture for our CNN-RNN model. 
-Another would be later experimentation with hyper parameters for our model to optimize its performance. Should our model perform poorly, 
-we may also wish to explore the normalization of our dataset. If we find that the quantity of training data is insufficient, data 
+We anticipate multiple subproblems we will have to address. One includes the creation of a model to evaluate the similarity of two
+sentences for the purposes of quantifying the performance of our CNN-RNN model. With our previous experience utilizing word2vec, this
+will be a problem we can quickly address. Other subproblems include determining the appropriate architecture for our CNN-RNN model.
+Another would be later experimentation with hyper parameters for our model to optimize its performance. Should our model perform poorly,
+we may also wish to explore the normalization of our dataset. If we find that the quantity of training data is insufficient, data
 augmentation to increase this set would be a viable option to explore.
 
 \section{Next Steps}
-Over the next month, there are several tasks we must complete. By February 21, we expect to have finished the annotation of our video 
-dataset with brief descriptions of the actions on screen. Once this is completed, the next step will be to work on the initial implementation. 
-We would like this to include a simple model containing an embedding layer that is able to quantify the difference in similarity between 
-two sentences. This will be critical in evaluating the accuracy of our generative model. Ideally, this will be completed the week of February 28. 
-While the embedding model is being completed, another pair of teammates will continue working on the generative model. We anticipate to have completed 
-a trainable iteration of this by the week of March 14, after which the focus will switch to experimenting with the construction of the model. Once we 
-have determined the impact on accuracy of these varying hyperparameters, we will begin focusing on the writing of a paper expressing our findings, and the 
+Over the next month, there are several tasks we must complete. By February 21, we expect to have finished the annotation of our video
+dataset with brief descriptions of the actions on screen. Once this is completed, the next step will be to work on the initial implementation.
+We would like this to include a simple model containing an embedding layer that is able to quantify the difference in similarity between
+two sentences. This will be critical in evaluating the accuracy of our generative model. Ideally, this will be completed the week of February 28.
+While the embedding model is being completed, another pair of teammates will continue working on the generative model. We anticipate to have completed
+a trainable iteration of this by the week of March 14, after which the focus will switch to experimenting with the construction of the model. Once we
+have determined the impact on accuracy of these varying hyperparameters, we will begin focusing on the writing of a paper expressing our findings, and the
 preparing of a project poster.
 
 \section{Division of Work}
-To ensure an even distribution of work between teammates, we will utilize issue tickets on git to assign to one another. We will have set meetings in which 
-we will determine what tasks must be completed by the next time we gather, create the tickets and then assign them. Should one person complete an issue early, 
+To ensure an even distribution of work between teammates, we will utilize issue tickets on git to assign to one another. We will have set meetings in which
+we will determine what tasks must be completed by the next time we gather, create the tickets and then assign them. Should one person complete an issue early,
 they will be able to assign themselves another ticket.
+
+\section{References}
+
+\bibliography{video-captioning-proposal}
 
 \end{document}
