@@ -21,11 +21,19 @@ Furthermore, as the pandemic has forced human interactions to be in large part, 
 a privilege, but a basic human right. This project proposes a tool to begin enabling better accessibility
 integration on video-streaming platforms such as Netflix and YouTube, through the automated
 closed captioning of videos. More specifically, given a short video clip, we propose a model which
-can generate a single sentence describing the events in the input. 
+can generate a single sentence describing the events in the input.
 
 \section{Data Collection and Processing}
-
-
+In this project, we propose utilizing the dataset built for Deepmind Kinetic as a means of
+circumventing the collection of short video clips (~10s) and hence, reducing the complexity associated
+with data collection. However, only a selective set of videos will be used to train and validate
+our model. To be specific, three videos from the each of the 700 classes will be selected, totalling
+to 2100 clips. The reason for the massive reduction in the dataset size is due to the additional labelling
+required for our specific use case. Deepmind Kenetic attempts to classify a video clip containing repetitive moments
+in one of 700 categories, wheras our model will attempt to generate a sentence describing the events occuring in the video.
+If the full dataset were to be used (~ 650,000) clips, there would be no time left to train the model. Additionally,
+our GPU resources are limited, and so, we do not have the capability to train models that require processing thousands of
+clips.
 
 
 \end{document}
