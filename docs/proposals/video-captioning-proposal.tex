@@ -28,7 +28,8 @@ can generate a single sentence describing the events in the input.
 \subsection{Collection}
 In this project, we propose utilizing the dataset designed for Deepmind Kinetic as a means of
 circumventing the collection of video clips sharing similar contexts and hence, reducing the complexity associated
-with finding an appropriate datset. However, only a selective set of videos will be used to train and validate
+with finding an appropriate datset. The Deepmind Kinetic 700 dataset contains 650,000 video clips collected from YouTube
+categorized in one of 700 different movement taxa. In our case, only a selective set of videos will be used to train and validate
 our model. To be specific, 600 videos from 3 random classes will be selected, totalling
 to 1800 clips. The reason for the massive reduction in the dataset size is due to the additional labelling
 required for our specific use case. Deepmind Kenetic attempts to classify a video clip containing repetitive moments
@@ -37,11 +38,14 @@ If the full dataset were to be labelled (\~650,000 clips), we would not be able 
 constraints. Additionally, our GPU resources are limited, and so, we do not have the capability to train models
 that require extensive video processing.
 
-\subsection{Procssing}
-As mentioned earlier, the data collected requires extra processing. As the our model attempts to generate sentences to describe
-the events in a video, each video must labelled with a sentence describing not only the repetive movement, but also
-any sequential actions that occured before and after the occurrence of a particular movement. While certain movements are shared
-across videos in the same category, the context in which the video was captured may be different, making labelling non-trivial.
+\subsection{Processing}
+As mentioned earlier, the data retrieved from Deepmind Kinect's dataset requires extra processing to fit our use-case.
+As the our model attempts to generate sentences to describe
+the events in a video, each video must labelled with a sentence describing not only the target movement, but also
+any actions that occured before and after the occurrence of a particular movement. While certain movements are shared
+across videos in the same category, the context in which the video was captured may differ, making labelling non-trivial.
+Videos will be clipped and labelled with a short description of the events that occured in the video, at which point we will be able
+to begin training.
 
 \section{Next Steps}
 
