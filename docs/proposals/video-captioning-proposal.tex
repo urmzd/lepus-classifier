@@ -19,12 +19,10 @@ Benjamin J. Macdonald$^1$\\
 }
 \bibliographystyle{apalike}
 
-\date{
-$^1$Faculty of Computer Science, Dalhousie University
-}
+\date{$^1$Faculty of Computer Science, Dalhousie University}
 \setcounter{secnumdepth}{0}
+
 \begin{document}
-\maketitle
 
 \section{Problem Statement}
 According to a report done by Nucleus Research \cite{nucleus_research_2019}, two-thirds
@@ -74,23 +72,21 @@ the different events? For this project to succeed, both of these questions must 
 Down below, we describe some relevant works and potential extensions to better fit our use case. 
 
 \subsection{I3D}
-\cite{DBLP:journals/corr/abs-2010-10864} details the usage of an RNN-CNN hybrid architecture (I3D) to determine 
-the most prevelant action in a video (DeepMind Kinetic 700). To accomplish our goal, the model can be extended to classify events beyond
-movement patterns. The classified events can then be fed through an embedding model to allow for a greater vocabulary,
-at which point, a language model can be used to generate a sentence that best encapsulates the events that occured.
+The publication for DeepMind Kinetic 700 details the usage of an RNN-CNN hybrid architecture (I3D) to determine 
+the most prevelant action in a video. To accomplish our goal, the model can be extended to classify events beyond
+movement patterns. Afterwards, a language model can be utilized to generate a sentence that best encapsulates the events that occured.
 
 \subsection{3D ResNet}
-On the same dataset mentioned above, \cite{du2021revisiting} was able to use a 3D ResNet for marginally better performance.
-The same classification was done with a different architecture. As a result, the process mentioned above can be, by large,
-carried over.
+To solve the same problem mentioned above, 3D ResNets were deployed for marginally better performance \cite{du2021revisiting}.
+As a result, the process mentioned above can be, by large, carried over.
 
 \subsection{BERT}
 VideoBERT is an extension of the BERT architecture that additionally utilizes video tokens \cite{sun2019videobert}. 
-The model found great success in the completion of masked sentences given a video clip. However, similar to the 
-above mentioned models, the dataset used was extremely large. However, the model was still able to perform within reason on training sets
-with $5000$ video clips, making this an interest model to explore the impact of data augmentation, regularization and normalization 
-on performance. Furthemore, as our task is to generate a sentence, it may be worth exploring if part of speech tags can be applied 
-to prevent the need for prefilling sentences.
+The model found great success in the completion of masked sentences given a video clip. Unlike the other datasets, the authors experimented 
+with different sized training sets and found that the model was still able to perform within reason on training sets
+with only $5000$ video clips. As a result, this architecture makes for a good project to explore the impact of data augmentation, regularization and normalization 
+on performance. Furthemore, as our task is to generate a sentence, it may be worth investigating if part of speech tags can be used
+to prevent hardwiring parts of the desired sentence. 
 
 \section{Next Steps}
 Over the next month, there are several tasks we must complete. By February 21, we expect to have finished the annotation of our video
