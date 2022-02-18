@@ -1,60 +1,80 @@
-\documentclass[11pt]{article}
-\usepackage[noblocks]{authblk}
-\title{Automated Close Captioning}
-\author[1]{Urmzd Mukhammadnaim \thanks{urmzd@dal.ca, B00800045}}
-\author[1]{Keelin Sekerka-Bajbus \thanks{kl967083@dal.ca, B00739421 }}
-\author[1]{Benjamin J. Macdonald \thanks{bn282348@dal.ca, B00803015}}
-\bibliographystyle{apa}
+\documentclass[10pt]{article}
+\usepackage{cite}
+\usepackage{lipsum}
+\usepackage{graphicx}
 
-\affil[1]{Faculty of Computer Science, Dalhousie University}
+\title{Automated Close Captioning}
+\author{
+Urmzd Mukhammadnaim$^1$\\
+\texttt{B00800045} \\
+\texttt{urmzd@dal.ca} \\
+\and
+Keelin Sekerka-Bajbus$^1$\\
+\texttt{B00739421}\\
+\texttt{kl967083@dal.ca}
+\fig
+\and
+Benjamin J. Macdonald$^1$\\
+\texttt{B00803015}\\
+\texttt{bn282348@dal.ca}
+}
+\bibliographystyle{apalike}
+
+\date{
+$^1$Faculty of Computer Science, Dalhousie University
+}
 \setcounter{secnumdepth}{0}
 \begin{document}
 \maketitle
 
-\section{Motivation}
-According to a meta-study done by Nucleus Research \cite{nucleus research_2019}, two-thirds
+\section{Problem Statement}
+According to a report done by Nucleus Research \cite{nucleus_research_2019}, two-thirds
 of online transactions are abandoned by blind individuals due to the lack of accessibility.
-Furthemore, approximately 36 million are said to have some degree of visual impairment, with the number
-expected to triple by 2050 according to a statistic by the World Health Organization \cite{world health organization_2021}.
-With a spending power of almost half a trillion dollars a year \cite{yin_smith_overton_shaewitz_2018}, providing accessibility
+Furthemore, approximately 36 million people are said to have some degree of visual impairment, with the number
+expected to triple by 2050 according to a statistic by the World Health Organization \cite{world_health_organization_2021}.
+With a spending power of around half a trillion dollars a year \cite{yin_smith_overton_shaewitz_2018}, providing accessibility
 as a service to individuals with disabilities is a untapped market that is by large, not catered to.
 Furthermore, as the pandemic has forced human interactions to be in large part, remote, accessibility is no longer
 a privilege, but a basic human right. This project proposes a tool to begin enabling better accessibility
 integration on video-streaming platforms such as Netflix and YouTube, through the automated
-closed captioning of videos. More specifically, given a short video clip, we propose a model which
-can generate a single sentence describing the events in the input.
+closed captioning of videos. More specifically, given a short video clip, we propose several potential approaches 
+involving the use of 3D ResNets, RNN-CNN hybrids and BERT models to generate a single sentence describing the events in the provided input.
 
-\newpage
 \section{Data Collection and Processing}
+
 \subsection{Collection}
 In this project, we propose utilizing the dataset designed for Deepmind Kinetic as a means of
-circumventing the collection of video clips sharing similar contexts and hence, reducing the complexity associated
-with finding an appropriate datset. The Deepmind Kinetic 700 dataset contains 650,000 video clips collected from YouTube
-categorized in one of 700 different movement taxa \cite{DBLP:journals/corr/abs-2010-10864}. In our case, only a selective set of videos will be used to train and validate
-our model. To be specific, 600 videos from 3 random classes will be selected, totalling
-to 1800 clips. The reason for the massive reduction in the dataset size is due to the additional labelling
-required for our specific use case. Deepmind Kenetic attempts to classify a video clip containing repetitive moments
-in one of 700 categories, whereas our model will attempt to generate a sentence describing the events occuring in the video.
-If the full dataset were to be labelled (\~650,000 clips), we would not be able to train the model due to the current time
-constraints. Additionally, our GPU resources are limited, and so, we do not have the capability to train models
+circumventing the collection of video clips sharing similar context. 
+The Deepmind Kinetic 700 dataset contains $650,000$ video clips collected from YouTube
+categorized in one of 700 different movement taxa \cite{DBLP:journals/corr/abs-2010-10864}. 
+For the sake of time, only a selective set of videos will be used to train and validate
+our model. To be specific, $600$ videos will be sampled from $3$ arbitrary classes, yielding 
+$600 \times 3 = 1800$ clips. The reason for the large reduction in the sample size is due to the additional labelling
+required for our use case. While Deepmind Kenetic attempts to classify a video clip containing repetitive moments
+in one of 700 categories, our model will be attempting to generate a sentence summarizing the events of a video.
+If the full Deepmind Kinetic dataset were to be used, we would not have enough time to train the model.
+Additionally, our GPU resources are limited, and so, we do not have the capability to train models
 that require extensive video processing.
 
 \subsection{Processing}
 As mentioned earlier, the data retrieved from Deepmind Kinect's dataset requires extra processing to fit our use-case.
 As the our model attempts to generate sentences to describe
 the events in a video, each video must labelled with a sentence describing not only the target movement, but also
-any actions that occured before and after the occurrence of a particular movement. While certain movements are shared
-across videos in the same category, the context in which the video was captured may differ, making labelling non-trivial.
-Videos will be clipped and labelled with a short description of the events that occured in the video, at which point we will be able
-to begin training.
+any actions occuring before and after the execution of a particular movement. While action definitions are shared between siblings
+in the same category, the context in which the video was captured may differ, making labelling non-trivial.
+To ensure enough time remains to train the model, preprocessing will consistent only of 
+trimming the videos and labelling the shortened video with a short description of the events within them.
 
-\section{Subproblems To Solve}
-We anticipate multiple subproblems we will have to address. One includes the creation of a model to evaluate the similarity of two
-sentences for the purposes of quantifying the performance of our CNN-RNN model. With our previous experience utilizing word2vec, this
-will be a problem we can quickly address. Other subproblems include determining the appropriate architecture for our CNN-RNN model.
-Another would be later experimentation with hyper parameters for our model to optimize its performance. Should our model perform poorly,
-we may also wish to explore the normalization of our dataset. If we find that the quantity of training data is insufficient, data
-augmentation to increase this set would be a viable option to explore.
+\section{Approaches}
+
+In the preliminary analysis of the stated problem, a few different approaches 
+
+\subsection{3D ResNets}
+
+\subsection{RNN-CNN Hybrid}
+
+\subsection{BERT Model}
+
 
 \section{Next Steps}
 Over the next month, there are several tasks we must complete. By February 21, we expect to have finished the annotation of our video
@@ -70,8 +90,6 @@ preparing of a project poster.
 To ensure an even distribution of work between teammates, we will utilize issue tickets on git to assign to one another. We will have set meetings in which
 we will determine what tasks must be completed by the next time we gather, create the tickets and then assign them. Should one person complete an issue early,
 they will be able to assign themselves another ticket.
-
-\section{References}
 
 \bibliography{video-captioning-proposal}
 
