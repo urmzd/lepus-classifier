@@ -36,8 +36,8 @@ as a service to individuals with disabilities is a untapped market that is by la
 Furthermore, as the pandemic has forced human interactions to be in large part, remote, accessibility is no longer
 a privilege, but a basic human right. This project proposes a tool to begin enabling better accessibility
 integration on video-streaming platforms such as Netflix and YouTube, through the automated
-closed captioning of videos. More specifically, given a short video clip, we propose several potential approaches 
-involving the use of 3D ResNets, RNN-CNN hybrids and BERT models to generate a single sentence describing the events in the provided input.
+closed captioning of videos. More specifically, given a short video clip, we propose several potential approaches,
+including 3D ResNets, RNN-CNN hybrids and BERT models to generate a single sentence describing the events in the provided input.
 
 \section{Data Collection and Processing}
 
@@ -66,32 +66,38 @@ trimming the videos and labelling the shortened video with a short description o
 
 \section{Approaches}
 
-In the preliminary analysis of the stated problem, a few different approaches were 
-found. 
-Before describing some of the approaches, it should be clarified what subproblems require solvings.
+In the preliminary analysis of the stated problem, a few different approaches were found. 
+Before describing some of the approaches, it should be clarified what subproblems require solving.
 The first problem is event classification, given a video, what key moments were encoutered?
 The second problem is language modelling, given the key moments, what sentence best encapsulates 
-the different events? For this project to succeed, both of these subproblems must be solved.
-Down below, we describe some relevant works and methods of extension to better fit our use case. 
+the different events? For this project to succeed, both of these questions must be answered.
+Down below, we describe some relevant works and potential extensions to better fit our use case. 
 
-\subsection{RNN-CNN Hybrid}
+\subsection{I3D}
 \cite{DBLP:journals/corr/abs-2010-10864} details the usage of an RNN-CNN hybrid architecture (I3D) to determine 
-the most prevelant action in a video. To accomplish our goal, the model can  
+the most prevelant action in a video (DeepMind Kinetic 700). To accomplish our goal, the model can be extended to classify events beyond
+movement patterns. The classified events can then be fed through an embedding model to allow for a greater vocabulary,
+at which point, a language model can be used to generate a sentence that best encapsulates the events that occured.
 
+\subsection{3D ResNet}
+On the same dataset mentioned above, \cite{du2021revisiting} was able to use a 3D ResNet for marginally better performance.
+The same classification was done with a different architecture. As a result, the process mentioned above can be, by large,
+carried over.
 
-\subsection{3D ResNets}
-
-
-
-\subsection{BERT Model}
-
+\subsection{BERT}
+VideoBERT is an extension of the BERT architecture that additionally utilizes video tokens \cite{sun2019videobert}. 
+The model found great success in the completion of masked sentences given a video clip. However, similar to the 
+above mentioned models, the dataset used was extremely large. However, the model was still able to perform within reason on training sets
+with $5000$ video clips, making this an interest model to explore the impact of data augmentation, regularization and normalization 
+on performance. Furthemore, as our task is to generate a sentence, it may be worth exploring if part of speech tags can be applied 
+to prevent the need for prefilling sentences.
 
 \section{Next Steps}
 Over the next month, there are several tasks we must complete. By February 21, we expect to have finished the annotation of our video
 dataset with brief descriptions of the actions on screen. Once this is completed, the next step will be to work on the initial implementation.
 We would like this to include a simple model containing an embedding layer that is able to quantify the difference in similarity between
 two sentences. This will be critical in evaluating the accuracy of our generative model. Ideally, this will be completed the week of February 28.
-While the embedding model is being completed, another pair of teammates will continue working on the generative model. We anticipate to have completed
+While the embedding model is being completed, other teammates will continue working on the generative model. We anticipate to have completed
 a trainable iteration of this by the week of March 14, after which the focus will switch to experimenting with the construction of the model. Once we
 have determined the impact on accuracy of these varying hyperparameters, we will begin focusing on the writing of a paper expressing our findings, and the
 preparing of a project poster.
