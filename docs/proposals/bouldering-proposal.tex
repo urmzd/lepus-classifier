@@ -1,6 +1,7 @@
 \documentclass[10pt]{article}
 \usepackage{cite}
 \usepackage{lipsum}
+\usepackage{hyperref}
 
 \title{Evaluating Bouldering Route Difficulty}
 \author{ Urmzd
@@ -20,51 +21,52 @@
 
 \section{Problem Statement}
 In rock climbing, the difficulty of climbing routes
-is classified using a grade given by climbers, generally depending on the
-length or style of the route, the challenge of the required moves, and how
-dangerous climbing conditions are. As a result, climbing grades are very
-subjective as they depend on a collective human assessment, and the many 
-existing grade scales are somewhat ambiguous when it comes to 
-distinguishing between closely related difficulty classes. 
-This presents a challenging task in attempting to accurately predict the 
-assignment of climbing grades using machine learning, with the potential 
-to benefit climbers' performance (particularly when training) and aid in
+are classified using a grade given by climbers. Generally, the grades depend on the
+length or style of the route, the challenge of the required moves, and the
+estimated danger of the climbing conditions. As a result, climbing grades are
+subjective as they depend on collective human assessment. It doesn't help that many 
+existing grade scales are also ambiguous when it comes to 
+distinguishing between approximate difficulty levels. 
+The lack of object route assessments presents an opportunity to build a model which can accurately predict the 
+the difficulty of a route, with the potential 
+to benefit climbers' performance, particularly when training) and aid in
 improving the ambiguity of standardized scales.
 
 With this project, we would explore predicting the climbing grade of Bouldering
-problems, climbing routes that are for free climbing without ropes or harnesses
-that are generally no higher than 6 metres, using the Hueco scale (V0 - V17).
+problems; routes that are designed for free climbing and do not involve the use 
+of ropes or a harnesses. Additionally the routes are typically no higher than 6 metres.
+For this project, we propose the use of the Hueco scale (V0 - V17).
 
 \section{Data Collection and Data Processing}
 
-To explore this challenging task, we would use climbing route data collected
-from https://www.moonboard.com/. Moonboards are a standardized climbing wall
-made up of 142 rock holds on an 18x11 grid that is used for indoor Bouldering
+To explore this task, we would use climbing route data collected from 
+\href{https://www.moonboard.com/}{moonboard.com}. Moonboards are a standardized climbing wall
+made up of 142 rock holds on an 18x11 grid. They are most often used for indoor Bouldering
 training. Moonboard climbers utilize an app to load a problem route to the
 board, the sequence of holds marked by illuminated LEDs, so a large dataset of
-problems have been created by Moonboard and community users (over 30k problems
+problems have already been created by Moonboard and community users. For reference, over 30k problems
 were scraped by Duh \& Chang in their 2021 work using RNN models for
-classification and route generation).
+classification and route generation \cite{DBLP:journals/corr/abs-2102-01788}.
 
 The Moonboard route can be effectively encoded as a ${0, 1}^(18 \times 11)$ matrix to
 serve as a graphical representation of the board, which can then be one-hot
-encoded (or multi-hot) to prepare the representation for input to the neural
-network. Essentially, the encoded climbing routes will allow the neural network
+encoded (or multi-hot) to prepare the representation for input to the classification 
+model. Essentially, the encoded climbing routes will allow the model 
 to look for patterns and similarities between climbing grade classes and learn
-to distinguish problems appropriately, particularly since the climbing routes
+to distinguish problems, since the climbing routes
 will follow a standard format as described above.
 
 \section{Approaches}
 We would explore this classification task by experimenting with a more advanced
-Convolution Neural Network architecture than in previous works,
+convolution neural network architecture than in previous works,
 and apply this architecture to the Moonboard dataset for training and
 testing. The Moonboard dataset will first need to be scraped and prepared with
 basic cleaning and pre-processing (e.g. standardizing the grade scale to use
-Hueco instead of a European scale, for instance). Data will need to undergo a
-hot-encoding process or similar to prepare to be inputted to the neural
-networks. The Neural Network architecture will be designed and implemented to be
+Hueco instead of a European scale). Data will need to undergo a
+hot-encoding process or in preparation for its input to a neural
+network. The neural network architecture will be designed and implemented to be
 applied to the climbing route data, with experiments addressing different
-activation functions, learning rates, and other parameters or normalization
+activation functions, learning rates, and other parameters 
 will be conducted to illustrate the network's performance and fine-tuning
 processes. Following experimental results, we will revisit our experiment
 design (or network architectures) as necessary with time permitting to
@@ -80,7 +82,7 @@ Dobles et al. (2017) employed and evaluated Naives Bayes, softmax regression,
 and Convolutional Neural Network classifiers to attempt to determine the
 difficulty grade of climbing routes, specifically using a dataset collected
 from Moonboard.com to standardize the data. They yielded the following
-results for each classifier respectively, 34.0\% 36.5\% 34.0\% \cite{dobles_sarmiento_satterthwaite_2017}.
+accuracies for each classifier respectively, 34.0\% 36.5\% 34.0\% \cite{dobles_sarmiento_satterthwaite_2017}.
 
 \subsection{RNN for Route Classification and Generation}
 Duh \& Chang (2021) employed RNN architectures to explore classifying
