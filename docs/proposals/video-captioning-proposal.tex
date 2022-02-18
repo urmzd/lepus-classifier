@@ -33,13 +33,13 @@ Benjamin J. Macdonald$^1$\\
 \section{Problem Statement}
 According to a report done by Nucleus Research \cite{nucleus_research_2019}, two-thirds
 of online transactions are abandoned by blind individuals due to the lack of accessibility.
-Furthemore, approximately 36 million people are said to have some degree of visual impairment, with the number
+Furthermore, approximately 36 million people are said to have some degree of visual impairment, with the number
 expected to triple by 2050 according to a statistic by the World Health Organization \cite{world_health_organization_2021}.
 With a spending power of around half a trillion dollars a year \cite{yin_smith_overton_shaewitz_2018}, providing accessibility
-as a service to individuals with disabilities is a untapped market that is by large, not catered to.
-Furthermore, as the pandemic has forced human interactions to be in large part, remote, accessibility is no longer
-a privilege, but a basic human right. This project proposes a tool to begin enabling better accessibility
-integration on video-streaming platforms such as Netflix and YouTube, through the automated
+as a service to individuals with disabilities is an untapped market that is, by large, not catered to.
+Furthermore, as the pandemic has forced human interactions to be in large part remote, accessibility is no longer
+a privilege but a fundamental human right. This project proposes a tool to enable better accessibility
+integration on video-streaming platforms such as Netflix and YouTube through the automated
 closed captioning of videos. More specifically, given a short video clip, we propose several potential approaches,
 including 3D ResNets, RNN-CNN hybrids and BERT models to generate a single sentence describing the events in the provided input.
 
@@ -56,7 +56,7 @@ $600 \times 3 = 1800$ clips. The reason for the large reduction in the sample si
 required for our use case. While DeepMind Kenetic attempts to classify a video clip containing repetitive moments
 in one of 700 categories, our model will be attempting to generate a sentence summarizing the events of a video.
 If the full DeepMind Kinetic dataset were to be used, we would not have enough time to train the model.
-Additionally, our GPU resources are limited, and so, we do not have the capability to train models
+Additionally, our GPU resources are limited, and so we do not have the capability to train models
 that require extensive video processing.
 
 \subsection{Processing}
@@ -72,8 +72,8 @@ trimming the videos and labelling the shortened video with a short description o
 
 In the preliminary analysis of the stated problem, a few different approaches were found. 
 Before describing some of the approaches, it should be clarified what subproblems require solving.
-The first problem is event classification, given a video, what key moments were encoutered?
-The second problem is language modelling, given the key moments, what sentence best encapsulates 
+The first problem is event classification; given a video, what key moments were encoutered?
+The second problem is language modelling; given the key moments, what sentence best encapsulates 
 the different events? For this project to succeed, both of these questions must be answered.
 Down below, we describe some relevant works and potential extensions to better fit our use case. 
 
