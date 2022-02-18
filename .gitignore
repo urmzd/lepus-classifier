@@ -10,5 +10,6 @@
 !**/*.tex
 !**/*.bib
 !**/*.md
+!**/*.png
 !Dockerfile
 
