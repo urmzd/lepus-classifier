@@ -43,21 +43,21 @@ involving the use of 3D ResNets, RNN-CNN hybrids and BERT models to generate a s
 \section{Data Collection and Processing}
 
 \subsection{Collection}
-In this project, we propose utilizing the dataset designed for Deepmind Kinetic as a means of
+In this project, we propose utilizing the dataset designed for DeepMind Kinetic as a means of
 circumventing the collection of video clips sharing similar context. 
-The Deepmind Kinetic 700 dataset contains $650,000$ video clips collected from YouTube
+The DeepMind Kinetic 700 dataset contains $650,000$ video clips collected from YouTube
 categorized in one of 700 different movement taxa \cite{DBLP:journals/corr/abs-2010-10864}. 
 For the sake of time, only a selective set of videos will be used to train and validate
 our model. To be specific, $600$ videos will be sampled from $3$ arbitrary classes, yielding 
 $600 \times 3 = 1800$ clips. The reason for the large reduction in the sample size is due to the additional labelling
-required for our use case. While Deepmind Kenetic attempts to classify a video clip containing repetitive moments
+required for our use case. While DeepMind Kenetic attempts to classify a video clip containing repetitive moments
 in one of 700 categories, our model will be attempting to generate a sentence summarizing the events of a video.
-If the full Deepmind Kinetic dataset were to be used, we would not have enough time to train the model.
+If the full DeepMind Kinetic dataset were to be used, we would not have enough time to train the model.
 Additionally, our GPU resources are limited, and so, we do not have the capability to train models
 that require extensive video processing.
 
 \subsection{Processing}
-As mentioned earlier, the data retrieved from Deepmind Kinect's dataset requires extra processing to fit our use-case.
+As mentioned earlier, the data retrieved from DeepMind Kinect's dataset requires extra processing to fit our use-case.
 As the our model attempts to generate sentences to describe
 the events in a video, each video must labelled with a sentence describing not only the target movement, but also
 any actions occuring before and after the execution of a particular movement. While action definitions are shared between siblings
@@ -67,11 +67,22 @@ trimming the videos and labelling the shortened video with a short description o
 
 \section{Approaches}
 
-In the preliminary analysis of the stated problem, a few different approaches 
+In the preliminary analysis of the stated problem, a few different approaches were 
+found. 
+Before describing some of the approaches, it should be clarified what subproblems require solvings.
+The first problem is event classification, given a video, what key moments were encoutered?
+The second problem is language modelling, given the key moments, what sentence best encapsulates 
+the different events? For this project to succeed, both of these subproblems must be solved.
+Down below, we describe some relevant works and methods of extension to better fit our use case. 
+
+\subsection{RNN-CNN Hybrid}
+\cite{DBLP:journals/corr/abs-2010-10864} details the usage of an RNN-CNN hybrid architecture (I3D) to determine 
+the most prevelant action in a video. To accomplish our goal, the model can  
+
 
 \subsection{3D ResNets}
 
-\subsection{RNN-CNN Hybrid}
+
 
 \subsection{BERT Model}
 
