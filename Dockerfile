@@ -1,11 +1,13 @@
-FROM ubuntu:latest
+FROM debian:latest
 
 # Set up dependencies.
 # Build documentation.
-RUN sudo apt update
-RUN sudo apt-get install texlive
+RUN apt update
+RUN apt-get install texlive
+
+COPY . /
 
 # Build program.
 
 # TODO
-CMD 
+ENTRYPOINT [ "/bin/bash" ]
