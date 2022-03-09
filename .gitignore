@@ -13,4 +13,4 @@
 !**/*.png
 !Dockerfile
 !resources/**/*
-
+!requirements.txt
