@@ -38,6 +38,15 @@ rabbit,https://vtfishandwildlife.com/sites/fishandwildlife/files/images/Learn%20
 rabbit,https://assets.atlasobscura.com/article_images/5159/image
 rabbit,https://animalia.us-east-1.linodeobjects.com/animals/photos/full/1.25x1/new-england-cottontail-rabbit.jpg
 rabbit,http://birdoculars.com/wp-content/uploads/2013/02/rabbit-1551117-640x480-1.jpg
+rabbit,https://www.northwestwildlife.com/wp-content/uploads/2018/10/nuttals-cottontail-rabbit-700x443.png
+rabbit,https://pixfeeds.com/images/24/549757/1200-547226928-eastern-cottontail-sitting-in-flower-garden.jpg
+rabbit,https://herebunny.com/wp-content/uploads/2020/03/Eastern-Cottontail.jpg
+rabbit,https://static.wikia.nocookie.net/parody/images/9/9d/Eastern_cottontail.jpg/revision/latest?cb=20141228160546
+rabbit,https://preview.redd.it/2coygp9o81671.jpg?width=640&crop=smart&auto=webp&s=405930472882154a0bbeea5a48e6fecb150b9459
+rabbit,https://cdn.pixabay.com/photo/2020/10/13/18/48/rabbit-5652587__340.jpg
+rabbit,https://i0.wp.com/thedrewacorn.com/wp-content/uploads/2018/03/thing-link.jpg?fit=640%2C360&ssl=1
+rabbit,https://preview.redd.it/cypx9phtut671.jpg?width=640&crop=smart&auto=webp&s=4691f6acd07d58940d87e21a072298cc3e78fecd
+rabbit,https://mdc.mo.gov/sites/default/files/styles/card_regular/public/mo_nature/media/images/2010/05/swamp_rabbit.jpg?itok=W5rSaC1v
 hare,https://upload.wikimedia.org/wikipedia/commons/4/44/Lepus_europaeus_%28Causse_M%C3%A9jean%2C_Loz%C3%A8re%29-cropped.jpg
 hare,https://www.worldatlas.com/r/w1200/upload/aa/02/c2/european-hare.jpg
 hare,https://animalia.us-east-1.linodeobjects.com/animals/photos/full/1.25x1/feldhase-im-w4tel.jpg
