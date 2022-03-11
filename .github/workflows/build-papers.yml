@@ -12,6 +12,8 @@ jobs:
 
       - name: Execute build process
         run: |
+          ls
+          ls scripts
           chmod +x scripts/compile-latex.sh
           ./scripts/compile-latex.sh
 
