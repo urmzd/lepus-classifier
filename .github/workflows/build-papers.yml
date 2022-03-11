@@ -10,8 +10,10 @@ jobs:
         with:
           pull: "NO-PULL"
 
-      - name: Execute build process
+      - name: Print dir
         run: ls
+
+      - name: Execute build process
         run: ./scripts/compile-latex.sh
 
       - name: Push changes
