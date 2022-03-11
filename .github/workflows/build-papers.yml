@@ -11,7 +11,7 @@ jobs:
           pull: "NO-PULL"
 
       - name: Execute build process
-        run: /bin/bash ./scripts/compile-latex.sh
+        run: find . && /bin/bash ./scripts/compile-latex.sh
 
       - name: Push changes
         uses: EndBug/add-and-commit@v7
