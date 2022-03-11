@@ -11,9 +11,11 @@ jobs:
           pull: "NO-PULL"
 
       - name: Execute build process
+        run: ls
         run: ./scripts/compile-latex.sh
 
-      - uses: EndBug/add-and-commit@v7
+      - name: Push changes
+        uses: EndBug/add-and-commit@v7
         with:
           message: Build the latest pdfs of all LaTeX papers
           pull: 'NO-PULL'
