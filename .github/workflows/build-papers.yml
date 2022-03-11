@@ -12,6 +12,7 @@ jobs:
 
       - name: Execute build process
         run: |
+          echo $SHELL
           ls
           ls scripts
           chmod +x scripts/compile-latex.sh
