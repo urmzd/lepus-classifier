@@ -10,11 +10,8 @@ jobs:
         with:
           pull: "NO-PULL"
 
-      - name: Print dir
-        run: cat scripts/compile-latex.sh
-
       - name: Execute build process
-        run: chmod +x ./scripts && ./scripts/compile-latex.sh
+        run: scripts/compile-latex.sh
 
       - name: Push changes
         uses: EndBug/add-and-commit@v7
