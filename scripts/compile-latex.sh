@@ -30,12 +30,6 @@ function compile-latex {
     pdflatex $tex
   done
 
-  pdfs=( *.pdf )
-
-  for pdf in ${pdfs[@]}; do
-    cp $pdf $1
-  done
-  
   # Go back home
   cd $1
 }
