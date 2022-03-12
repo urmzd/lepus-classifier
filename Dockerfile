@@ -1,13 +1,7 @@
 FROM debian:latest
 
-# Set up dependencies.
-# Build documentation.
-RUN apt update
-RUN apt-get install texlive
+RUN apt-get update -y
+RUN apt-get install texlive-latex-extra -y
+RUN apt-get install git -y
 
-COPY . /
-
-# Build program.
-
-# TODO
 ENTRYPOINT [ "/bin/bash" ]
