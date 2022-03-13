@@ -12,20 +12,23 @@ from difPy import dif
 import requests
 import shutil
 import os
+import csv
 
 if not os.path.exists('images'):
     os.mkdir('images')
 
 urls = []
-with open('data.txt') as f:
-    line = f.readline()
-    while line:
-        line = f.readline()
+with open('../resources/data.csv','r') as f:
+    csv_read = csv.reader(f)
+    header = next(csv_read)
+    if header is not None:
+        for row in csv_read:
 
-        if line.strip():
-            image_url = line.split(',')
-            image_url = image_url[1].strip()
-            urls.append(image_url)
+            line = row[1]
+
+            if line.strip():
+                image_url = line.strip()
+                urls.append(image_url)
 
 f.close()
 
