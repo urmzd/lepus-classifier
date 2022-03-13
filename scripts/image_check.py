@@ -23,7 +23,6 @@ with open('../resources/data.csv','r') as f:
     header = next(csv_read)
     if header is not None:
         for row in csv_read:
-
             line = row[1]
 
             if line.strip():
@@ -32,9 +31,13 @@ with open('../resources/data.csv','r') as f:
 
 f.close()
 
-for i, link in enumerate(urls):
-    response = requests.get(link)
+session = requests.Session()
+headers = {'User-Agent': 'Mozilla/5.0'}
+cookies = dict(BCPermissionLevel='PERSONAL')
 
+for i, link in enumerate(urls):
+    response = requests.get(link, headers=headers, cookies=cookies)
+    print(i,response,link)
     image_name = 'images' + '/' + str(i + 1) + '.jpg'
 
     with open(image_name, 'wb') as fh:
