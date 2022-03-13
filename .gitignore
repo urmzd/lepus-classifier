@@ -14,3 +14,6 @@
 !Dockerfile
 !resources/**/*
 !requirements.txt
+!scripts/**/*
+!.github/**/*
+
