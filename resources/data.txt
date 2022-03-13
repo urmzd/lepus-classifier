@@ -6,7 +6,6 @@ rabbit,https://www.welcomewildlife.com/wp-content/uploads/2019/01/Cottontail-%C2
 rabbit,https://i.natgeofe.com/k/58df97a7-5c47-44b8-97c1-cddecd7d4a4f/full-body-cottontail_4x3.jpg
 rabbit,https://upload.wikimedia.org/wikipedia/commons/0/0f/Sylvilagus_audubonii_2.jpg
 rabbit,https://northernnester.com/wp-content/uploads/2020/01/cottontail-rabbits.jpg
-rabbit,https://www.northwestwildlife.com/wp-content/uploads/2018/10/nuttals-cottontail-rabbit-700x443.png
 rabbit,https://www.reconnectwithnature.org/getmedia/04322096-c66a-49ad-8780-1d51ffeee519/Cottontail-rabbit-Shutterstock.jpg.aspx
 rabbit,https://static.wikia.nocookie.net/wildkratts/images/1/12/Eastern_Cottontail_Rabbit_RL.PNG/revision/latest?cb=20191223185526
 rabbit,https://portal.ct.gov/lib/deep/wildlife/images/outreach/fact_sheets/cottontail.jpg
