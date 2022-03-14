@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 '''
 Program: Image Check
 Description: Image Checking Script using difPy to identify duplicate images in the collected dataset
@@ -8,42 +9,65 @@ Script Results:
 
 '''
 
+from typing import Optional
 from difPy import dif
 import requests
-import shutil
-import os
-import csv
+import pathlib
 
-if not os.path.exists('images'):
-    os.mkdir('images')
 
-urls = []
-with open('../resources/data.csv','r') as f:
-    csv_read = csv.reader(f)
-    header = next(csv_read)
-    if header is not None:
-        for row in csv_read:
-            line = row[1]
+import pandas as pd
+import requests
+import re
+import pathlib
 
-            if line.strip():
-                image_url = line.strip()
-                urls.append(image_url)
+DATA_PATH="resources/data.csv"
+IMAGE_PATH="/tmp/images"
 
-f.close()
+def get_data() -> pd.DataFrame:
+  df = pd.read_csv(DATA_PATH, usecols=range(2))
+  if isinstance(df, pd.DataFrame):
+      return df
 
-session = requests.Session()
-headers = {'User-Agent': 'Mozilla/5.0'}
-cookies = dict(BCPermissionLevel='PERSONAL')
+  raise Exception("THIS SHOULD NEVER HAPPEN.")
 
-for i, link in enumerate(urls):
-    response = requests.get(link, headers=headers, cookies=cookies)
-    print(i,response,link)
-    image_name = 'images' + '/' + str(i + 1) + '.jpg'
+def download_image(link: str) -> pathlib.Path:
+  # view  : https://regex101.com/r/3bhDMM/1
+  # delete: https://regex101.com/delete/N5sItwbrPF73ZllTnRDltxZ1
+  file_name_regex = re.compile(r".*\/(.*(\.(jpeg|jpg|png))?)\??.*", flags=re.IGNORECASE)
+  regex_matches = file_name_regex.match(link)
 
-    with open(image_name, 'wb') as fh:
-        fh.write(response.content)
+  if not regex_matches:
+    raise Exception(f"Failed to match file_name for link {link}")
 
-fh.close()
+  if len(regex_matches.groups()) < 3:
+    file_name = regex_matches.group(1) + ".png"
+  else:
+    file_name = regex_matches.group(1)
 
-search = dif("images")
+  content_path = pathlib.Path(IMAGE_PATH)
+  content_path.mkdir(parents=True, exist_ok=True)
+
+  file_path = content_path / file_name
+
+  if file_path.exists():
+    return file_path
+
+  image_request_headers={
+      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'
+  }
+
+  image = requests.get(link, headers=image_request_headers)
+
+  with open(file_path, "wb") as handle:
+    handle.write(image.content)
+
+  return file_path
+
+df = get_data()
+
+for link in df.iloc[:, 1].tolist():
+    download_image(link)
+
+search = dif("/tmp/images")
+
 print(search.result)
