@@ -1,7 +1,7 @@
 from collections import namedtuple
 import numpy as np
 from pipetools.main import Pipe
-from typing import NewType, List, Tuple
+from typing import Callable, NewType, List, Tuple
 
 from sklearn.preprocessing import OneHotEncoder
 
@@ -18,5 +18,6 @@ YDataSet = NewType("YDataSet", np.ndarray)
 DataSet = namedtuple("DataSet", ["x", "y"])
 
 XEncoder = NewType("XEncoder", Pipe)
-YEncoder = NewType("YEncoder", OneHotEncoder)
-Encoders = Tuple[XEncoder, YEncoder]
+LabelEncoderHandler = NewType("LabelEncoderHandler", OneHotEncoder)
+LabelEncoder = Callable[[Label], YDataSet]
+Encoders = Tuple[XEncoder, LabelEncoderHandler]

@@ -1,18 +1,11 @@
 from functools import partial
 from sklearn.preprocessing import OneHotEncoder
-import numpy as np
-from pipetools import pipe, foreach
+from pipetools import pipe
 import cv2
 from custom_types import (
-    DataSet,
-    Encoders,
     Image,
-    PreEncodedImages,
-    PreEncodedLabels,
-    XDataSet,
     XEncoder,
-    YDataSet,
-    YEncoder,
+    LabelEncoderHandler,
 )
 
 
@@ -114,7 +107,7 @@ def crop_image(
     return img[h_low:h_high, w_low:w_high]
 
 
-def get_x_encoder(
+def get_image_encoder(
     desired_height: int, desired_width: int, scale_height: bool = False
 ) -> XEncoder:
     return XEncoder(
@@ -142,23 +135,6 @@ def get_x_encoder(
     )
 
 
-def get_x_y_preprocessors(
-    _x: PreEncodedImages,
-    y: PreEncodedLabels,
-    desired_height: int,
-    desired_width: int,
-    scale_height: bool = False,
-) -> Encoders:
-    y_encoder = OneHotEncoder(sparse=False).fit(y)
-    x_encoder = get_x_encoder(desired_height, desired_width, scale_height)
-
-    return XEncoder(x_encoder), YEncoder(y_encoder)
-
-
-def get_processed_x_y(
-    x: PreEncodedImages, y: PreEncodedLabels, x_encoder: XEncoder, y_encoder: YEncoder
-) -> DataSet:
-    x_encoded = x > foreach(x_encoder) | list | np.array
-    y_encoded = y_encoder.transform(y)
-
-    return DataSet(XDataSet(x_encoded), YDataSet(y_encoded))
+def get_label_encoder_handler(labels) -> LabelEncoderHandler:
+    label_encoder = OneHotEncoder(sparse=False).fit(labels)
+    return LabelEncoderHandler(label_encoder)
