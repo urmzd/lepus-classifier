@@ -15,5 +15,7 @@
 !resources/**/*
 !requirements.txt
 !scripts/**/*
+!src/**/*
+!notebooks/**/*
 !.github/**/*
 
