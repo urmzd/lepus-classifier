@@ -1,5 +1,4 @@
 from functools import partial
-from typing import Callable
 from sklearn.preprocessing import OneHotEncoder
 import numpy as np
 from pipetools import pipe, foreach
