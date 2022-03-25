@@ -1,11 +1,9 @@
 from functools import partial
 from sklearn.preprocessing import OneHotEncoder
-import albumentations as A
 import numpy as np
 from pipetools import pipe, foreach
 import cv2
-
-from types import TransformedImage, TransformedLabel, Image, XDataSet, YDataSet
+from custom_types import TransformedImage, TransformedLabel, Image, XDataSet, YDataSet
 
 
 def get_scaled_dimensions(dim1: int, dim2: int, target_dim: int, reverse=False):

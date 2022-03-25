@@ -7,5 +7,5 @@ Label = NewType("Label", str)
 TransformedImage = NewType("TransformedImage", List[Image])
 TransformedLabel = NewType("TransformedLabel", np.ndarray)
 ImageLabelPair = namedtuple("ImageLabelPair", "image label")
-XDataSet = np.ndarray
-YDataSet = np.ndarray
+XDataSet = NewType("XDataSet", np.ndarray)
+YDataSet = NewType("YDataSet", np.ndarray)

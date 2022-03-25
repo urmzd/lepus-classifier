@@ -1,11 +1,10 @@
-from collections import namedtuple
 import pandas as pd
 import re
 import requests
 import matplotlib.pyplot as plt
 import cv2
 from pathlib import Path
-from types import ImageLabelPair, Image, TransformedImage, TransformedLabel
+from custom_types import ImageLabelPair, Image, TransformedImage, TransformedLabel
 
 
 def get_data(data_path: str) -> pd.DataFrame:
