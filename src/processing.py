@@ -2,8 +2,6 @@ from functools import partial
 from sklearn.preprocessing import OneHotEncoder
 import albumentations as A
 import numpy as np
-import tensorflow as tf
-import matplotlib.pyplot as plt
 from pipetools import pipe, foreach
 import cv2
 

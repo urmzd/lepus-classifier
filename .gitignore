@@ -11,11 +11,11 @@
 !**/*.bib
 !**/*.md
 !**/*.png
+!**/*.py
+!**/*.ipynb
 !Dockerfile
 !resources/**/*
 !requirements.txt
 !scripts/**/*
-!src/**/*
-!notebooks/**/*
 !.github/**/*
 
