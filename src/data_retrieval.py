@@ -4,7 +4,7 @@ import requests
 import matplotlib.pyplot as plt
 import cv2
 from pathlib import Path
-from custom_types import ImageLabelPair, Image, PreEncodedImages, PreEncodedLabels
+from custom_types import PreEncodedDataSet, Image, PreEncodedImages, PreEncodedLabels
 
 
 def get_data(data_path: str) -> pd.DataFrame:
@@ -63,12 +63,14 @@ def get_image(file_path: Path, show=False) -> Image:
     return Image(image)
 
 
-def get_x_y(raw_data: pd.DataFrame, image_folder_path: str) -> ImageLabelPair:
-    y = raw_data.iloc[:, 0].to_numpy()
+def get_pre_encoded_dataset(
+    data: pd.DataFrame, image_folder_path: str
+) -> PreEncodedDataSet:
+    y = data.iloc[:, 0].to_numpy()
     y = y.reshape(-1, 1)
 
-    x_links = raw_data.iloc[:, 1].tolist()
+    x_links = data.iloc[:, 1].tolist()
     x_paths = [download_image(link, image_folder_path) for link in x_links]
     x = [get_image(path) for path in x_paths]
 
-    return ImageLabelPair(PreEncodedImages(x), PreEncodedLabels(y))
+    return PreEncodedDataSet(PreEncodedImages(x), PreEncodedLabels(y))

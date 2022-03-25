@@ -9,9 +9,10 @@ from custom_types import (
     Image,
     PreEncodedImages,
     PreEncodedLabels,
-    ProcessorFactory,
     XDataSet,
+    XEncoder,
     YDataSet,
+    YEncoder,
 )
 
 
@@ -113,8 +114,10 @@ def crop_image(
     return img[h_low:h_high, w_low:w_high]
 
 
-def get_x_encoder(desired_height: int, desired_width: int, scale_height: bool = False):
-    return (
+def get_x_encoder(
+    desired_height: int, desired_width: int, scale_height: bool = False
+) -> XEncoder:
+    return XEncoder(
         pipe
         | partial(
             resize_image,
@@ -149,13 +152,12 @@ def get_x_y_preprocessors(
     y_encoder = OneHotEncoder(sparse=False).fit(y)
     x_encoder = get_x_encoder(desired_height, desired_width, scale_height)
 
-    return x_encoder, y_encoder
+    return XEncoder(x_encoder), YEncoder(y_encoder)
 
 
 def get_processed_x_y(
-    x: PreEncodedImages, y: PreEncodedLabels, processor_factory: ProcessorFactory
+    x: PreEncodedImages, y: PreEncodedLabels, x_encoder: XEncoder, y_encoder: YEncoder
 ) -> DataSet:
-    x_encoder, y_encoder = processor_factory(x, y)
     x_encoded = x > foreach(x_encoder) | list | np.array
     y_encoded = y_encoder.transform(y)
 
