@@ -1,9 +1,18 @@
 from functools import partial
+from typing import Callable
 from sklearn.preprocessing import OneHotEncoder
 import numpy as np
 from pipetools import pipe, foreach
 import cv2
-from custom_types import TransformedImage, TransformedLabel, Image, XDataSet, YDataSet
+from custom_types import (
+    Encoders,
+    PreprocessedImage,
+    PreprocessedLabel,
+    Image,
+    ProcessorFactory,
+    XDataSet,
+    YDataSet,
+)
 
 
 def get_scaled_dimensions(dim1: int, dim2: int, target_dim: int, reverse=False):
@@ -130,19 +139,24 @@ def get_x_encoder(desired_height: int, desired_width: int, scale_height: bool = 
     )
 
 
-def get_x_y_preprocessors(x: TransformedImage, y: TransformedLabel):
+def get_x_y_preprocessors(
+    x: PreprocessedImage,
+    y: PreprocessedLabel,
+    desired_height: int,
+    desired_width: int,
+    scale_height: bool = False,
+) -> Encoders:
     y_encoder = OneHotEncoder(sparse=False).fit(y)
-    x_encoder = get_x_encoder()
+    x_encoder = get_x_encoder(desired_height, desired_width, scale_height)
 
     return x_encoder, y_encoder
 
 
-def get_processed_x_y(x: TransformedImage, y: TransformedLabel):
-
-    x_encoder, y_encoder = get_x_y_preprocessors(x, y)
-
+def get_processed_x_y(
+    x: PreprocessedImage, y: PreprocessedLabel, processor_factory: ProcessorFactory
+):
+    x_encoder, y_encoder = processor_factory(x, y)
     x_encoded = x > foreach(x_encoder) | list | np.array
-
     y_encoded = y_encoder.transform(y)
 
     return XDataSet(x_encoded), YDataSet(y_encoded)

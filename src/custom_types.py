@@ -1,11 +1,22 @@
 from collections import namedtuple
 import numpy as np
-from typing import NewType, List
+from typing import Callable, NewType, List, Tuple
+
+from sklearn.preprocessing import OneHotEncoder
 
 Image = NewType("Image", np.ndarray)
 Label = NewType("Label", str)
-TransformedImage = NewType("TransformedImage", List[Image])
-TransformedLabel = NewType("TransformedLabel", np.ndarray)
+
+PreEncodedImages = NewType("PreEncodedImages", List[Image])
+PreEncodedLabels = NewType("PreEncodedLabels", np.ndarray)
+
 ImageLabelPair = namedtuple("ImageLabelPair", "image label")
+
 XDataSet = NewType("XDataSet", np.ndarray)
 YDataSet = NewType("YDataSet", np.ndarray)
+
+XEncoder = Callable[[Image], Image]
+YEncoder = OneHotEncoder
+Encoders = Tuple[XEncoder, YEncoder]
+
+ProcessorFactory = Callable[[PreEncodedImages, PreEncodedLabels], Encoders]

@@ -4,7 +4,7 @@ import requests
 import matplotlib.pyplot as plt
 import cv2
 from pathlib import Path
-from custom_types import ImageLabelPair, Image, TransformedImage, TransformedLabel
+from custom_types import ImageLabelPair, Image, PreprocessedImage, PreprocessedLabel
 
 
 def get_data(data_path: str) -> pd.DataFrame:
@@ -16,8 +16,11 @@ def get_data(data_path: str) -> pd.DataFrame:
 
 
 def download_image(link: str, image_folder_path: str) -> Path:
-    # view  : https://regex101.com/r/3bhDMM/1
-    # delete: https://regex101.com/delete/N5sItwbrPF73ZllTnRDltxZ1
+    """Downloads the image from the specified link to the given folder path.
+
+    View  : https://regex101.com/r/3bhDMM/1
+    Delete: https://regex101.com/delete/N5sItwbrPF73ZllTnRDltxZ1
+    """
     file_name_regex = re.compile(
         r".*\/(.*(\.(jpeg|jpg|png))?)\??.*", flags=re.IGNORECASE
     )
@@ -68,4 +71,4 @@ def get_x_y(raw_data: pd.DataFrame, image_folder_path: str) -> ImageLabelPair:
     x_paths = [download_image(link, image_folder_path) for link in x_links]
     x = [get_image(path) for path in x_paths]
 
-    return ImageLabelPair(TransformedImage(x), TransformedLabel(y))
+    return ImageLabelPair(PreprocessedImage(x), PreprocessedLabel(y))
