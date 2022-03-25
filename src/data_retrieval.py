@@ -1,10 +1,10 @@
+from pathlib import Path
 import pandas as pd
 import re
 import requests
 import matplotlib.pyplot as plt
 import cv2
-from pathlib import Path
-from custom_types import PreEncodedDataSet, Image, PreEncodedImages, PreEncodedLabels
+from custom_types import DataSet, Image, PreEncodedImages, PreEncodedLabels
 
 
 def get_data(data_path: str) -> pd.DataFrame:
@@ -73,4 +73,4 @@ def get_pre_encoded_dataset(
     x_paths = [download_image(link, image_folder_path) for link in x_links]
     x = [get_image(path) for path in x_paths]
 
-    return PreEncodedDataSet(PreEncodedImages(x), PreEncodedLabels(y))
+    return DataSet(PreEncodedImages(x), PreEncodedLabels(y))
