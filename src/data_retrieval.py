@@ -4,7 +4,12 @@ import re
 import requests
 import matplotlib.pyplot as plt
 import cv2
-from custom_types import DataSet, Image, PreEncodedImages, PreEncodedLabels
+from custom_types import (
+    Image,
+    PreEncodedDataSet,
+    PreEncodedImages,
+    PreEncodedLabels,
+)
 
 
 def get_data(data_path: str) -> pd.DataFrame:
@@ -73,4 +78,4 @@ def get_pre_encoded_dataset(
     x_paths = [download_image(link, image_folder_path) for link in x_links]
     x = [get_image(path) for path in x_paths]
 
-    return DataSet(PreEncodedImages(x), PreEncodedLabels(y))
+    return PreEncodedDataSet(PreEncodedImages(x), PreEncodedLabels(y))
