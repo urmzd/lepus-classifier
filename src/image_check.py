@@ -3,7 +3,7 @@
 from difPy import dif
 from data_retrieval import get_data, download_image
 
-DATA_PATH="resources/data.csv"
+DATA_PATH="../resources/data.csv"
 IMAGE_PATH="/tmp/images"
 
 if __name__ == "__main__":
