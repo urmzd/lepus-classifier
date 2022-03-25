@@ -6,9 +6,9 @@ import cv2
 from custom_types import (
     DataSet,
     Encoders,
-    PreprocessedImage,
-    PreprocessedLabel,
     Image,
+    PreEncodedImages,
+    PreEncodedLabels,
     ProcessorFactory,
     XDataSet,
     YDataset,
@@ -140,8 +140,8 @@ def get_x_encoder(desired_height: int, desired_width: int, scale_height: bool = 
 
 
 def get_x_y_preprocessors(
-    x: PreprocessedImage,
-    y: PreprocessedLabel,
+    x: PreEncodedImages,
+    y: PreEncodedLabels,
     desired_height: int,
     desired_width: int,
     scale_height: bool = False,
@@ -153,7 +153,7 @@ def get_x_y_preprocessors(
 
 
 def get_processed_x_y(
-    x: PreprocessedImage, y: PreprocessedLabel, processor_factory: ProcessorFactory
+    x: PreEncodedImages, y: PreEncodedLabels, processor_factory: ProcessorFactory
 ) -> DataSet:
     x_encoder, y_encoder = processor_factory(x, y)
     x_encoded = x > foreach(x_encoder) | list | np.array
