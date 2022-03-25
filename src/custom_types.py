@@ -11,7 +11,7 @@ Label = NewType("Label", str)
 PreEncodedImages = NewType("PreEncodedImages", List[Image])
 PreEncodedLabels = NewType("PreEncodedLabels", np.ndarray)
 
-PreEncodedDataSet = namedtuple("ImageLabelPair", "image label")
+PreEncodedDataSet = namedtuple("PreEncodedDataSet", "image label")
 
 XDataSet = NewType("XDataSet", np.ndarray)
 YDataSet = NewType("YDataSet", np.ndarray)
