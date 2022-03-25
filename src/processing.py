@@ -5,13 +5,14 @@ import numpy as np
 from pipetools import pipe, foreach
 import cv2
 from custom_types import (
+    DataSet,
     Encoders,
     PreprocessedImage,
     PreprocessedLabel,
     Image,
     ProcessorFactory,
     XDataSet,
-    YDataSet,
+    YDataset,
 )
 
 
@@ -154,9 +155,9 @@ def get_x_y_preprocessors(
 
 def get_processed_x_y(
     x: PreprocessedImage, y: PreprocessedLabel, processor_factory: ProcessorFactory
-):
+) -> DataSet:
     x_encoder, y_encoder = processor_factory(x, y)
     x_encoded = x > foreach(x_encoder) | list | np.array
     y_encoded = y_encoder.transform(y)
 
-    return XDataSet(x_encoded), YDataSet(y_encoded)
+    return DataSet(XDataSet(x_encoded), YDataset(y_encoded))

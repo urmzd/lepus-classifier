@@ -14,6 +14,7 @@ ImageLabelPair = namedtuple("ImageLabelPair", "image label")
 
 XDataSet = NewType("XDataSet", np.ndarray)
 YDataSet = NewType("YDataSet", np.ndarray)
+DataSet = namedtuple("DataSet", "x y")
 
 XEncoder = Callable[[Image], Image]
 YEncoder = OneHotEncoder
