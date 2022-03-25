@@ -15,6 +15,6 @@ def get_encoded_x_y(
     x_encoder, y_encoder = get_x_y_preprocessors(
         images, labels, desired_height, desired_width, scale_height
     )
-    x, y = get_processed_x_y(images, labels, x_encoder, y_encoder)
+    dataset = get_processed_x_y(images, labels, x_encoder, y_encoder)
 
-    return x, y
+    return dataset
