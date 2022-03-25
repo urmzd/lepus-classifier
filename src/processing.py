@@ -1,16 +1,13 @@
 from functools import partial
 from sklearn.preprocessing import OneHotEncoder
 import albumentations as A
+import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from pipetools import pipe, foreach
 import cv2
 
-from types import TransformedImage, TransformedLabel, Image
-
-DESIRED_HEIGHT = 200
-DESIRED_WIDTH = 200
-SCALE_HEIGHT = False
+from types import TransformedImage, TransformedLabel, Image, XDataSet, YDataSet
 
 
 def get_scaled_dimensions(dim1: int, dim2: int, target_dim: int, reverse=False):
@@ -150,6 +147,6 @@ def get_processed_x_y(x: TransformedImage, y: TransformedLabel):
 
     x_encoded = x > foreach(x_encoder) | list | np.array
 
-    y_encoded: np.ndarray = y_encoder.transform(y)
+    y_encoded = y_encoder.transform(y)
 
-    return x_encoded, y_encoded
+    return XDataSet(x_encoded), YDataSet(y_encoded)

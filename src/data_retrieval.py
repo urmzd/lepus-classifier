@@ -5,6 +5,7 @@ import requests
 import matplotlib.pyplot as plt
 import cv2
 from pathlib import Path
+from types import ImageLabelPair, Image, TransformedImage, TransformedLabel
 
 
 def get_data(data_path: str) -> pd.DataFrame:
