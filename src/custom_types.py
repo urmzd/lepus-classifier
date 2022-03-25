@@ -11,11 +11,11 @@ Label = NewType("Label", str)
 PreEncodedImages = NewType("PreEncodedImages", List[Image])
 PreEncodedLabels = NewType("PreEncodedLabels", np.ndarray)
 
-PreEncodedDataSet = namedtuple("PreEncodedDataSet", "image label")
+PreEncodedDataSet = namedtuple("PreEncodedDataSet", ["image", "label"])
 
 XDataSet = NewType("XDataSet", np.ndarray)
 YDataSet = NewType("YDataSet", np.ndarray)
-DataSet = namedtuple("DataSet", "x y")
+DataSet = namedtuple("DataSet", ["x", "y"])
 
 XEncoder = NewType("XEncoder", Pipe)
 YEncoder = NewType("YEncoder", OneHotEncoder)
