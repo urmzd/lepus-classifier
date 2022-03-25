@@ -11,7 +11,7 @@ from custom_types import (
     PreEncodedLabels,
     ProcessorFactory,
     XDataSet,
-    YDataset,
+    YDataSet,
 )
 
 
@@ -140,7 +140,7 @@ def get_x_encoder(desired_height: int, desired_width: int, scale_height: bool = 
 
 
 def get_x_y_preprocessors(
-    x: PreEncodedImages,
+    _x: PreEncodedImages,
     y: PreEncodedLabels,
     desired_height: int,
     desired_width: int,
@@ -159,4 +159,4 @@ def get_processed_x_y(
     x_encoded = x > foreach(x_encoder) | list | np.array
     y_encoded = y_encoder.transform(y)
 
-    return DataSet(XDataSet(x_encoded), YDataset(y_encoded))
+    return DataSet(XDataSet(x_encoded), YDataSet(y_encoded))
