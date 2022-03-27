@@ -2,7 +2,7 @@ from functools import partial
 from sklearn.preprocessing import OneHotEncoder
 from pipetools import pipe
 import cv2
-from custom_types import (
+from data.data_types import (
     Image,
     XEncoder,
     LabelEncoderHandler,
