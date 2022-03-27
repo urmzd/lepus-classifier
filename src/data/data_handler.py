@@ -13,10 +13,11 @@ from data.data_types import TargetEncoder, FeaturesEncoder
 from typing import Any, Dict, List, Optional, Type
 from torch.utils.data import Dataset
 from abc import ABC, abstractmethod
-from pytorch_lightning.loops.base import Loop, FitLoop
+from pytorch_lightning.loops.base import Loop
+from pytorch_lightning.loops.fit_loop import FitLoop
 from pytorch_lightning.trainer.states import TrainerFn
 
-from src.data.data_extractor import download_image, get_data, get_image
+from data.data_extractor import download_image, get_data, get_image
 
 
 class StratifiedKFoldDataModule(pl.LightningDataModule, ABC):
@@ -221,7 +222,7 @@ class EnsembleVotingModel(pl.LightningModule):
 
     def test_step(self, batch: Any) -> None:
         logits = torch.stack([m(batch[0]) for m in self.models]).mean(0)
-        loss = F.nll_loss()
+        loss = F.nll_loss(logits, batch[1])
         self.test_acc(logits, batch[1])
         self.log("test_acc", self.test_acc)
         self.log("test_loss", loss)
