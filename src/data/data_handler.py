@@ -5,12 +5,16 @@ from pathlib import Path
 
 import pytorch_lightning as pl
 from sklearn.model_selection import StratifiedKFold, train_test_split
+import torch
+from torch.nn import functional as F
+from torchmetrics import Accuracy
 from data.data_types import TargetEncoder, FeaturesEncoder
 
-from typing import Optional
+from typing import Any, Dict, List, Optional, Type
 from torch.utils.data import Dataset
 from abc import ABC, abstractmethod
 from pytorch_lightning.loops.base import Loop, FitLoop
+from pytorch_lightning.trainer.states import TrainerFn
 
 from src.data.data_extractor import download_image, get_data, get_image
 
@@ -56,7 +60,6 @@ class LepusDataset(Dataset):
 
 @dataclass
 class LepusStratifiedKFoldDataModule(StratifiedKFoldDataModule):
-    # TODO -- ADD TEST SET
     train_dataset: Optional[LepusDataset] = None
     test_dataset: Optional[LepusDataset] = None
     batch_size: int = 1
@@ -141,7 +144,7 @@ class StratifiedKFoldLoop(Loop):
 
     def on_run_start(self, *args: Any, **kwargs: Any) -> None:
         assert isinstance(self.trainer.datamodule, StratifiedKFoldDataModule)
-        self.lighning_module_start_dict = deepcopy(
+        self.lighning_module_state_dict = deepcopy(
             self.trainer.lightning_module.state_dict()
         )
 
@@ -162,4 +165,63 @@ class StratifiedKFoldLoop(Loop):
         return super().on_advance_end()
 
     def on_advance_end(self) -> None:
-        return super().on_advance_end()
+        self.trainer.save_checkpoint(
+            Path(self.export_path) / f"model.fold-{self.current_fold}".pt
+        )
+        self.trainer.lightning_module.load_state_dict(self.lighning_module_state_dict)
+        self.trainer.strategy.setup_optimizers(self.trainer)
+        self.replace(fitloop=FitLoop)
+
+    def on_run_end(self) -> None:
+        checkpoint_paths = [
+            Path(self.export_path) / f"model.fold-{fold}"
+            for fold in range(self.num_folds)
+        ]
+        voting_model = EnsembleVotingModel(
+            type(self.trainer.lightning_module), checkpoint_paths
+        )
+        voting_model.trainer = self.trainer
+        self.trainer.strategy.connect(voting_model)
+        self.trainer.strategy.model_to_device()
+        self.trainer.test_loop.run()
+
+    def on_save_checkpoint(self) -> Dict[str, int]:
+        return {"current_fold": self.current_fold}
+
+    def on_load_checkpoint(self, state_dict: Dict[str, int]) -> None:
+        self.current_fold = state_dict["current_fold"]
+
+    def _reset_fitting(self) -> None:
+        self.trainer.reset_train_dataloader()
+        self.trainer.reset_val_dataloader()
+        self.trainer.state.fn = TrainerFn.FITTING
+        self.trainer.training = True
+
+    def _reset_testing(self) -> None:
+        self.trainer.reset_test_dataloader()
+        self.trainer.state.fn = TrainerFn.TESTING
+        self.trainer.testing = True
+
+    def __getattr__(self, key) -> Any:
+        if key not in self.__dict__:
+            return getattr(self.fit_loop, key)
+
+        return self.__dict__[key]
+
+
+class EnsembleVotingModel(pl.LightningModule):
+    def __init__(
+        self, model_cls: Type[pl.LightningModule], checkpoint_paths: List[Path]
+    ) -> None:
+        super().__init__()
+        self.models = torch.nn.ModuleList(
+            [model_cls.load_from_checkpoint(p) for p in checkpoint_paths]
+        )
+        self.test_acc = Accuracy()
+
+    def test_step(self, batch: Any) -> None:
+        logits = torch.stack([m(batch[0]) for m in self.models]).mean(0)
+        loss = F.nll_loss()
+        self.test_acc(logits, batch[1])
+        self.log("test_acc", self.test_acc)
+        self.log("test_loss", loss)
