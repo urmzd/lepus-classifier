@@ -17,7 +17,7 @@ XDataSet = NewType("XDataSet", np.ndarray)
 YDataSet = NewType("YDataSet", np.ndarray)
 DataSet = namedtuple("DataSet", ["x", "y"])
 
-XEncoder = NewType("XEncoder", Pipe)
-LabelEncoderHandler = NewType("LabelEncoderHandler", OneHotEncoder)
-LabelEncoder = Callable[[Label], YDataSet]
-Encoders = Tuple[XEncoder, LabelEncoderHandler]
+FeaturesEncoder = NewType("FeaturesEncoder", Pipe)
+TargetEncoderHandler = NewType("TargetEncoderHandler", OneHotEncoder)
+TargetEncoder = Callable[[Label], YDataSet]
+Encoders = Tuple[FeaturesEncoder, TargetEncoderHandler]
