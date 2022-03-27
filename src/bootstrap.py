@@ -1,11 +1,14 @@
 from functools import partial
 from pytorch_lightning import seed_everything, Trainer
 from sklearn.preprocessing import OneHotEncoder
-from data.data_handler import SampleModel, LepusStratifiedKFoldDataModule
 from pathlib import Path
-from data.data_extractor import get_data
 
 from src.data.data_processing import get_image_encoder
+from src.data.data_handler import (
+    SampleModel,
+    LepusStratifiedKFoldDataModule,
+    StratifiedKFoldLoop,
+)
 
 seed_everything(42)
 
@@ -22,9 +25,10 @@ if __name__ == "__main__":
             desired_height=HEIGHT, desired_width=WIDTH, scale_height=SCALE_HEIGHT
         )
     )
-    y_encoder = OneHotEncoder()
     datamodule = LepusStratifiedKFoldDataModule(
-        data_manifest_path=DATA_MANFIEST_PATH, image_folder_path=IMAGE_FOLDER_PATH
+        data_manifest_path=DATA_MANFIEST_PATH,
+        image_folder_path=IMAGE_FOLDER_PATH,
+        transform_features=x_encoder,
     )
     trainer = Trainer(
         max_epochs=10,
@@ -37,6 +41,6 @@ if __name__ == "__main__":
         strategy="ddp",
     )
     internal_fit_loop = trainer.fit_loop
-    trainer.fit_loop = KFoldLoop(5, export_path="./")
+    trainer.fit_loop = StratifiedKFoldLoop(5, export_path="./")
     trainer.fit_loop.connect(internal_fit_loop)
     trainer.fit(model, datamodule)

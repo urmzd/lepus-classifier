@@ -3,7 +3,7 @@ import pandas as pd
 import re
 import requests
 import cv2
-from data.data_types import Image
+from src.data.data_types import Image
 
 
 def get_data(data_path: Path) -> pd.DataFrame:

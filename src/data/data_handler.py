@@ -9,7 +9,6 @@ from sklearn.preprocessing import OneHotEncoder
 import torch
 from torch.nn import functional as F
 from torchmetrics import Accuracy
-from data.data_types import TargetEncoder, FeaturesEncoder
 
 from typing import Any, Dict, List, Optional, Type
 from torch.utils.data import Dataset
@@ -17,8 +16,10 @@ from abc import ABC, abstractmethod
 from pytorch_lightning.loops.base import Loop
 from pytorch_lightning.loops.fit_loop import FitLoop
 from pytorch_lightning.trainer.states import TrainerFn
+from src.data.data_processing import get_target_encoder_handler
 
-from data.data_extractor import download_image, get_data, get_image
+from src.data.data_types import TargetEncoder, FeaturesEncoder
+from src.data.data_extractor import download_image, get_data, get_image
 
 
 class StratifiedKFoldDataModule(pl.LightningDataModule, ABC):
@@ -63,11 +64,11 @@ class LepusDataset(Dataset):
 @dataclass
 class LepusStratifiedKFoldDataModule(StratifiedKFoldDataModule):
     transform_features: FeaturesEncoder
-    transform_targets: bool
     image_folder_path: Path
     data_manfiest_path: str
     batch_size: int = 1
     n_splits: int = 1
+    transform_targets: bool = True
 
     def prepare_data(self) -> None:
         if (
@@ -81,6 +82,7 @@ class LepusStratifiedKFoldDataModule(StratifiedKFoldDataModule):
 
     def setup(self, stage: Optional[str] = None):
         if self.transform_targets:
+            self.target_encoder = get_target_encoder_handler(self.data[:, 0])
             self.target_encoder = OneHotEncoder(self.data[:, 0], sparse=False)
         else:
             self.target_encoder = None
