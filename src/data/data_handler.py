@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytorch_lightning as pl
 from sklearn.model_selection import StratifiedKFold, train_test_split
+from sklearn.preprocessing import OneHotEncoder
 import torch
 from torch.nn import functional as F
 from torchmetrics import Accuracy
@@ -54,34 +55,36 @@ class LepusDataset(Dataset):
             image = self.transform(image)
 
         if self.target_transform is not None:
-            label = self.target_transform(image_label)
+            image_label = self.target_transform(image_label)
 
-        return image, label
+        return image, image_label
 
 
 @dataclass
 class LepusStratifiedKFoldDataModule(StratifiedKFoldDataModule):
-    train_dataset: Optional[LepusDataset] = None
-    test_dataset: Optional[LepusDataset] = None
+    transform_features: FeaturesEncoder
+    transform_targets: bool
+    image_folder_path: Path
+    data_manfiest_path: str
     batch_size: int = 1
-    data_manfiest_path: Optional[str] = None
     n_splits: int = 1
-    image_folder_path: Optional[Path] = None
-    transform_features: Optional[FeaturesEncoder] = None
-    transform_targets: Optional[TargetEncoder] = None
 
     def prepare_data(self) -> None:
         if (
             self.data_manfiest_path is not None
             and self.image_folder_path is not None
             and self.transform_features is not None
-            and self.transform_targets is not None
         ):
             self.data = get_data(self.data_manfiest_path)
 
         raise ValueError("data_manifest_path must be a Path object.")
 
     def setup(self, stage: Optional[str] = None):
+        if self.transform_targets:
+            self.target_encoder = OneHotEncoder(self.data[:, 0], sparse=False)
+        else:
+            self.target_encoder = None
+
         train_set, test_set = train_test_split(self.data)
         self.train_dataset, self.test_dataset = train_set, test_set
 
@@ -103,7 +106,7 @@ class LepusStratifiedKFoldDataModule(StratifiedKFoldDataModule):
             targets,
             self.image_folder_path,
             self.transform_features,
-            self.transform_targets,
+            self.target_encoder,
         )
 
     def val_dataloader(self) -> LepusDataset:
@@ -114,7 +117,7 @@ class LepusStratifiedKFoldDataModule(StratifiedKFoldDataModule):
             targets,
             self.image_folder_path,
             self.transform_features,
-            self.transform_targets,
+            self.target_encoder,
         )
 
     def test_dataloader(self) -> LepusDataset:
@@ -125,8 +128,11 @@ class LepusStratifiedKFoldDataModule(StratifiedKFoldDataModule):
             targets,
             self.image_folder_path,
             self.transform_features,
-            self.transform_targets,
+            self.target_encoder,
         )
+
+    def __post_init__(cls):
+        super().__init__()
 
 
 class StratifiedKFoldLoop(Loop):
@@ -226,3 +232,20 @@ class EnsembleVotingModel(pl.LightningModule):
         self.test_acc(logits, batch[1])
         self.log("test_acc", self.test_acc)
         self.log("test_loss", loss)
+
+
+class SampleModel(pl.LightningModule):
+    def __init__(self, height, width, n_targets=2) -> None:
+        self.seq = torch.nn.Sequential(
+            [
+                torch.nn.Conv2d(1, 15, 2, 2),
+                torch.nn.MaxPool2d(2, 2),
+                torch.nn.ReLU(),
+                torch.nn.Flatten(),
+                torch.nn.Linear(56 * 56, n_targets),
+                torch.nn.LogSoftmax(),
+            ]
+        )
+
+    def forward(self):
+        return self.seq
