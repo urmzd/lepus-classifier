@@ -14,12 +14,12 @@ seed_everything(42)
 
 if __name__ == "__main__":
     seed_everything(42)
-    model = SampleModel()
     DATA_MANFIEST_PATH = Path("../resources/data.csv")
     IMAGE_FOLDER_PATH = Path("/tmp/images")
     HEIGHT = 200
     WIDTH = 200
     SCALE_HEIGHT = False
+    model = SampleModel(height=HEIGHT, width=WIDTH)
     x_encoder = partial(
         get_image_encoder(
             desired_height=HEIGHT, desired_width=WIDTH, scale_height=SCALE_HEIGHT
@@ -36,7 +36,7 @@ if __name__ == "__main__":
         limit_val_batches=2,
         limit_test_batches=2,
         num_sanity_val_steps=0,
-        devices=2,
+        devices=1,
         accelerator="auto",
         strategy="ddp",
     )

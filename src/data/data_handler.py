@@ -65,18 +65,18 @@ class LepusDataset(Dataset):
 class LepusStratifiedKFoldDataModule(StratifiedKFoldDataModule):
     transform_features: FeaturesEncoder
     image_folder_path: Path
-    data_manfiest_path: str
+    data_manifest_path: str
     batch_size: int = 1
     n_splits: int = 1
     transform_targets: bool = True
 
     def prepare_data(self) -> None:
         if (
-            self.data_manfiest_path is not None
+            self.data_manifest_path is not None
             and self.image_folder_path is not None
             and self.transform_features is not None
         ):
-            self.data = get_data(self.data_manfiest_path)
+            self.data = get_data(self.data_manifest_path)
 
         raise ValueError("data_manifest_path must be a Path object.")
 
@@ -181,6 +181,9 @@ class StratifiedKFoldLoop(Loop):
         self.trainer.strategy.setup_optimizers(self.trainer)
         self.replace(fitloop=FitLoop)
 
+    def reset(self) -> None:
+        return None
+
     def on_run_end(self) -> None:
         checkpoint_paths = [
             Path(self.export_path) / f"model.fold-{fold}"
@@ -238,15 +241,14 @@ class EnsembleVotingModel(pl.LightningModule):
 
 class SampleModel(pl.LightningModule):
     def __init__(self, height, width, n_targets=2) -> None:
+        super().__init__()
         self.seq = torch.nn.Sequential(
-            [
-                torch.nn.Conv2d(1, 15, 2, 2),
-                torch.nn.MaxPool2d(2, 2),
-                torch.nn.ReLU(),
-                torch.nn.Flatten(),
-                torch.nn.Linear(56 * 56, n_targets),
-                torch.nn.LogSoftmax(),
-            ]
+            torch.nn.Conv2d(1, 15, 2, 2),
+            torch.nn.MaxPool2d(2, 2),
+            torch.nn.ReLU(),
+            torch.nn.Flatten(),
+            torch.nn.Linear(56 * 56, n_targets),
+            torch.nn.LogSoftmax(),
         )
 
     def forward(self):
