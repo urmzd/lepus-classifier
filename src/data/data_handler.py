@@ -253,3 +253,12 @@ class SampleModel(pl.LightningModule):
 
     def forward(self):
         return self.seq
+
+    def training_step(self, batch, batch_idx) -> None:
+        x, y = batch
+        y_hat = self(x)
+        loss = F.cross_entropy(y_hat, y)
+        return loss
+
+    def validation_step(self, batch, batch_idx) -> None:
+        pass
