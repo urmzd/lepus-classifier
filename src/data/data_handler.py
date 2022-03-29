@@ -187,23 +187,19 @@ class StratifiedKFoldLoop(Loop):
         self.current_fold += 1
 
     def on_advance_end(self) -> None:
-        self.trainer.save_checkpoint()
-        return super().on_advance_end()
-
-    def on_advance_end(self) -> None:
         self.trainer.save_checkpoint(
-            Path(self.export_path) / f"model.fold-{self.current_fold}".pt
+            Path(self.export_path) / f"model.fold-{self.current_fold}.pt"
         )
         self.trainer.lightning_module.load_state_dict(self.lighning_module_state_dict)
         self.trainer.strategy.setup_optimizers(self.trainer)
-        self.replace(fitloop=FitLoop)
+        self.replace(fit_loop=FitLoop)
 
     def reset(self) -> None:
         return None
 
     def on_run_end(self) -> None:
         checkpoint_paths = [
-            Path(self.export_path) / f"model.fold-{fold}"
+            Path(self.export_path) / f"model.fold-{fold}.pt"
             for fold in range(self.num_folds)
         ]
         voting_model = EnsembleVotingModel(

@@ -19,6 +19,7 @@ if __name__ == "__main__":
     WIDTH = 200
     SCALE_HEIGHT = False
     BATCH_SIZE = 2
+    NUM_FOLDS = 1
     model = SampleModel(height=HEIGHT, width=WIDTH)
     x_encoder = partial(
         get_image_encoder(
@@ -30,6 +31,7 @@ if __name__ == "__main__":
         image_folder_path=IMAGE_FOLDER_PATH,
         transform_features=x_encoder,
         batch_size=BATCH_SIZE,
+        n_splits=NUM_FOLDS,
     )
     trainer = Trainer(
         max_epochs=10,
@@ -42,6 +44,6 @@ if __name__ == "__main__":
         strategy="ddp",
     )
     internal_fit_loop = trainer.fit_loop
-    trainer.fit_loop = StratifiedKFoldLoop(5, export_path="./")
+    trainer.fit_loop = StratifiedKFoldLoop(NUM_FOLDS, export_path="./")
     trainer.fit_loop.connect(internal_fit_loop)
     trainer.fit(model, datamodule)
