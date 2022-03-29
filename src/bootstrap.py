@@ -1,6 +1,8 @@
 from functools import partial
+import sys
 from pytorch_lightning import seed_everything, Trainer
 from pathlib import Path
+from loguru import logger
 
 from src.data.data_processing import get_image_encoder
 from src.data.data_handler import (
@@ -12,6 +14,9 @@ from src.data.data_handler import (
 seed_everything(42)
 
 if __name__ == "__main__":
+    logger.remove()
+    LOG_LEVEL = "INFO"
+    logger.add(sys.stderr, level=LOG_LEVEL)
     seed_everything(42)
     DATA_MANFIEST_PATH = Path("./resources/data.csv")
     IMAGE_FOLDER_PATH = Path("/tmp/images")
@@ -20,7 +25,7 @@ if __name__ == "__main__":
     SCALE_HEIGHT = False
     BATCH_SIZE = 2
     NUM_FOLDS = 1
-    model = SampleModel(height=HEIGHT, width=WIDTH)
+    model = SampleModel()
     x_encoder = partial(
         get_image_encoder(
             desired_height=HEIGHT, desired_width=WIDTH, scale_height=SCALE_HEIGHT
@@ -47,3 +52,4 @@ if __name__ == "__main__":
     trainer.fit_loop = StratifiedKFoldLoop(NUM_FOLDS, export_path="./")
     trainer.fit_loop.connect(internal_fit_loop)
     trainer.fit(model, datamodule)
+    logger.info(trainer.logged_metrics)

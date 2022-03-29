@@ -187,8 +187,12 @@ class StratifiedKFoldLoop(Loop):
         self.current_fold += 1
 
     def on_advance_end(self) -> None:
+        # Create parent path.
+        Path("model_checkpoints").mkdir(parents=True, exist_ok=True)
+
         self.trainer.save_checkpoint(
-            Path(self.export_path) / f"model.fold-{self.current_fold}.pt"
+            Path(self.export_path)
+            / f"model_checkpoints/model.fold-{self.current_fold}.pt"
         )
         self.trainer.lightning_module.load_state_dict(self.lighning_module_state_dict)
         self.trainer.strategy.setup_optimizers(self.trainer)
@@ -199,7 +203,7 @@ class StratifiedKFoldLoop(Loop):
 
     def on_run_end(self) -> None:
         checkpoint_paths = [
-            Path(self.export_path) / f"model.fold-{fold}.pt"
+            Path(self.export_path) / f"model_checkpoints/model.fold-{fold + 1}.pt"
             for fold in range(self.num_folds)
         ]
         voting_model = EnsembleVotingModel(
@@ -253,7 +257,7 @@ class EnsembleVotingModel(pl.LightningModule):
 
 
 class SampleModel(pl.LightningModule):
-    def __init__(self, height, width, n_targets=2) -> None:
+    def __init__(self, n_targets=2) -> None:
         super().__init__()
         # O: H/2, W/2
         self.layer_1 = torch.nn.Conv2d(1, 15, 2, 2)
