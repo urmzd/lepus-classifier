@@ -1,6 +1,5 @@
 from functools import partial
 from pytorch_lightning import seed_everything, Trainer
-from sklearn.preprocessing import OneHotEncoder
 from pathlib import Path
 
 from src.data.data_processing import get_image_encoder
@@ -14,11 +13,12 @@ seed_everything(42)
 
 if __name__ == "__main__":
     seed_everything(42)
-    DATA_MANFIEST_PATH = Path("../resources/data.csv")
+    DATA_MANFIEST_PATH = Path("./resources/data.csv")
     IMAGE_FOLDER_PATH = Path("/tmp/images")
     HEIGHT = 200
     WIDTH = 200
     SCALE_HEIGHT = False
+    BATCH_SIZE = 2
     model = SampleModel(height=HEIGHT, width=WIDTH)
     x_encoder = partial(
         get_image_encoder(
@@ -29,6 +29,7 @@ if __name__ == "__main__":
         data_manifest_path=DATA_MANFIEST_PATH,
         image_folder_path=IMAGE_FOLDER_PATH,
         transform_features=x_encoder,
+        batch_size=BATCH_SIZE,
     )
     trainer = Trainer(
         max_epochs=10,

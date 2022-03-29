@@ -1,9 +1,13 @@
 from functools import partial
-from pandas import Series
 from sklearn.preprocessing import OneHotEncoder
 from pipetools import pipe
 import cv2
-from src.data.data_types import FeaturesEncoder, Image, TargetEncoderHandler
+from src.data.data_types import (
+    FeaturesEncoder,
+    Image,
+    TargetEncoder,
+)
+import numpy as np
 
 
 def get_scaled_dimensions(dim1: int, dim2: int, target_dim: int, reverse=False):
@@ -104,6 +108,11 @@ def crop_image(
     return img[h_low:h_high, w_low:w_high]
 
 
+def reshape_image(image: Image) -> Image:
+    reshaped_image = image[np.newaxis, ...]
+    return reshaped_image
+
+
 def get_image_encoder(
     desired_height: int, desired_width: int, scale_height: bool = False
 ) -> FeaturesEncoder:
@@ -129,9 +138,15 @@ def get_image_encoder(
             desired_width=desired_width,
             scale_height=scale_height,
         )
+        | reshape_image
     )
 
 
-def get_target_encoder_handler(target: Series) -> TargetEncoderHandler:
+def get_target_encoder(target: np.ndarray) -> TargetEncoder:
     label_encoder = OneHotEncoder(sparse=False).fit(target.reshape(-1, 1))
-    return label_encoder
+
+    def transform(data):
+        transformed_data = label_encoder.transform(np.array(data).reshape(-1, 1))
+        return transformed_data
+
+    return transform

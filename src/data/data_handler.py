@@ -1,11 +1,16 @@
 from copy import deepcopy
 from dataclasses import dataclass
-import pandas as pd
+import numpy as np
 from pathlib import Path
+from torch.utils.data import DataLoader
+
 
 import pytorch_lightning as pl
+from sklearn.model_selection import (
+    StratifiedShuffleSplit,
+    train_test_split,
+)
 from sklearn.model_selection import StratifiedKFold, train_test_split
-from sklearn.preprocessing import OneHotEncoder
 import torch
 from torch.nn import functional as F
 from torchmetrics import Accuracy
@@ -16,7 +21,7 @@ from abc import ABC, abstractmethod
 from pytorch_lightning.loops.base import Loop
 from pytorch_lightning.loops.fit_loop import FitLoop
 from pytorch_lightning.trainer.states import TrainerFn
-from src.data.data_processing import get_target_encoder_handler
+from src.data.data_processing import get_target_encoder
 
 from src.data.data_types import TargetEncoder, FeaturesEncoder
 from src.data.data_extractor import download_image, get_data, get_image
@@ -31,8 +36,8 @@ class StratifiedKFoldDataModule(pl.LightningDataModule, ABC):
 class LepusDataset(Dataset):
     def __init__(
         self,
-        features: pd.Series,
-        targets: pd.Series,
+        features: np.ndarray,
+        targets: np.ndarray,
         image_folder_path: Path,
         transform: Optional[FeaturesEncoder] = None,
         target_transform: Optional[TargetEncoder] = None,
@@ -44,7 +49,7 @@ class LepusDataset(Dataset):
         self.target_transform = target_transform
 
     def __len__(self):
-        return len(self.targets.index)
+        return len(self.targets)
 
     def __getitem__(self, idx):
         image_link = self.features[idx]
@@ -56,7 +61,7 @@ class LepusDataset(Dataset):
             image = self.transform(image)
 
         if self.target_transform is not None:
-            image_label = self.target_transform(image_label)
+            image_label = self.target_transform(image_label)[0, :]
 
         return image, image_label
 
@@ -65,7 +70,7 @@ class LepusDataset(Dataset):
 class LepusStratifiedKFoldDataModule(StratifiedKFoldDataModule):
     transform_features: FeaturesEncoder
     image_folder_path: Path
-    data_manifest_path: str
+    data_manifest_path: Path
     batch_size: int = 1
     n_splits: int = 1
     transform_targets: bool = True
@@ -76,14 +81,13 @@ class LepusStratifiedKFoldDataModule(StratifiedKFoldDataModule):
             and self.image_folder_path is not None
             and self.transform_features is not None
         ):
-            self.data = get_data(self.data_manifest_path)
-
-        raise ValueError("data_manifest_path must be a Path object.")
+            self.data = get_data(self.data_manifest_path).to_numpy()
+        else:
+            raise ValueError("data_manifest_path must be a Path object.")
 
     def setup(self, stage: Optional[str] = None):
         if self.transform_targets:
-            self.target_encoder = get_target_encoder_handler(self.data[:, 0])
-            self.target_encoder = OneHotEncoder(self.data[:, 0], sparse=False)
+            self.target_encoder = get_target_encoder(self.data[:, 0])
         else:
             self.target_encoder = None
 
@@ -92,45 +96,58 @@ class LepusStratifiedKFoldDataModule(StratifiedKFoldDataModule):
 
         features, targets = train_set[:, 1], train_set[:, 0]
 
-        splitter = StratifiedKFold(self.n_splits)
-        self.splits = [split for split in splitter.split(features, targets)]
+        if self.n_splits >= 2:
+            splitter = StratifiedKFold(self.n_splits)
+            self.splits = [split for split in splitter.split(features, targets)]
+        else:
+            splitter = StratifiedShuffleSplit(1, test_size=0.8)
+            self.splits = [split for split in splitter.split(features, targets)]
 
     def setup_fold_using_index(self, fold_index: int) -> None:
         train_indices, val_indices = self.splits[fold_index]
         self.train_indices = train_indices
         self.val_indices = val_indices
 
-    def train_dataloader(self) -> LepusDataset:
+    def train_dataloader(self) -> DataLoader:
         features = self.train_dataset[self.train_indices, 1]
         targets = self.train_dataset[self.train_indices, 0]
-        return LepusDataset(
-            features,
-            targets,
-            self.image_folder_path,
-            self.transform_features,
-            self.target_encoder,
+        return DataLoader(
+            LepusDataset(
+                features,
+                targets,
+                self.image_folder_path,
+                self.transform_features,
+                self.target_encoder,
+            ),
+            self.batch_size,
         )
 
-    def val_dataloader(self) -> LepusDataset:
+    def val_dataloader(self) -> DataLoader:
         features = self.train_dataset[self.val_indices, 1]
         targets = self.train_dataset[self.val_indices, 0]
-        return LepusDataset(
-            features,
-            targets,
-            self.image_folder_path,
-            self.transform_features,
-            self.target_encoder,
+        return DataLoader(
+            LepusDataset(
+                features,
+                targets,
+                self.image_folder_path,
+                self.transform_features,
+                self.target_encoder,
+            ),
+            self.batch_size,
         )
 
-    def test_dataloader(self) -> LepusDataset:
+    def test_dataloader(self) -> DataLoader:
         features = self.test_dataset[:, 1]
         targets = self.test_dataset[:, 0]
-        return LepusDataset(
-            features,
-            targets,
-            self.image_folder_path,
-            self.transform_features,
-            self.target_encoder,
+        return DataLoader(
+            LepusDataset(
+                features,
+                targets,
+                self.image_folder_path,
+                self.transform_features,
+                self.target_encoder,
+            ),
+            self.batch_size,
         )
 
     def __post_init__(cls):
@@ -242,17 +259,24 @@ class EnsembleVotingModel(pl.LightningModule):
 class SampleModel(pl.LightningModule):
     def __init__(self, height, width, n_targets=2) -> None:
         super().__init__()
-        self.seq = torch.nn.Sequential(
-            torch.nn.Conv2d(1, 15, 2, 2),
-            torch.nn.MaxPool2d(2, 2),
-            torch.nn.ReLU(),
-            torch.nn.Flatten(),
-            torch.nn.Linear(56 * 56, n_targets),
-            torch.nn.LogSoftmax(),
-        )
+        # O: H/2, W/2
+        self.layer_1 = torch.nn.Conv2d(1, 15, 2, 2)
+        # O: H/2, W/2
+        self.layer_2 = torch.nn.MaxPool2d(2, 2)
+        self.layer_3 = torch.nn.ReLU()
+        self.layer_4 = torch.nn.Flatten(1, -1)
+        self.layer_5 = torch.nn.Linear(15 * 50 * 50, n_targets)
+        self.layer_6 = torch.nn.LogSoftmax()
 
-    def forward(self):
-        return self.seq
+    def forward(self, x):
+        x_1 = self.layer_1(x)
+        x_2 = self.layer_2(x_1)
+        x_3 = self.layer_3(x_2)
+        x_4 = self.layer_4(x_3)
+        x_5 = self.layer_5(x_4)
+        x_6 = self.layer_6(x_5)
+        result = self.layer_6(x_6)
+        return result
 
     def training_step(self, batch, batch_idx) -> None:
         x, y = batch
@@ -261,4 +285,10 @@ class SampleModel(pl.LightningModule):
         return loss
 
     def validation_step(self, batch, batch_idx) -> None:
-        pass
+        x, y = batch
+        y_hat = self(x)
+        val_loss = F.cross_entropy(y_hat, y)
+        return val_loss
+
+    def configure_optimizers(self):
+        return torch.optim.Adam(self.parameters(), lr=0.02)
