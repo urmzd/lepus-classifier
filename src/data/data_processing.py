@@ -1,10 +1,11 @@
 from functools import partial
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from pipetools import pipe
 import cv2
 from src.data.data_types import (
     FeaturesEncoder,
     Image,
+    Label,
     TargetEncoder,
 )
 import numpy as np
@@ -143,10 +144,10 @@ def get_image_encoder(
 
 
 def get_target_encoder(target: np.ndarray) -> TargetEncoder:
-    label_encoder = OneHotEncoder(sparse=False).fit(target.reshape(-1, 1))
+    label_encoder = LabelEncoder().fit(target)
 
-    def transform(data):
-        transformed_data = label_encoder.transform(np.array(data).reshape(-1, 1))
+    def transform(data: Label):
+        transformed_data = label_encoder.transform([data])[0]
         return transformed_data
 
     return transform

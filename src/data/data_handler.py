@@ -61,7 +61,7 @@ class LepusDataset(Dataset):
             image = self.transform(image)
 
         if self.target_transform is not None:
-            image_label = self.target_transform(image_label)[0, :]
+            image_label = self.target_transform(image_label)
 
         return image, image_label
 
