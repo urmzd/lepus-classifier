@@ -264,6 +264,7 @@ class SampleModel(pl.LightningModule):
         self.layer_5 = torch.nn.Linear(15 * 50 * 50, n_targets)
         self.layer_6 = torch.nn.LogSoftmax()
         self.test_acc = Accuracy()
+        self.save_hyperparameters()
 
     def forward(self, x):
         x_1 = self.layer_1(x)

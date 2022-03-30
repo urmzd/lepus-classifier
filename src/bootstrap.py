@@ -1,9 +1,9 @@
 from functools import partial
-from os import mkdir
 import sys
 from pytorch_lightning import seed_everything, Trainer
 from pathlib import Path
 from loguru import logger
+import wandb
 
 from src.data.data_processing import get_image_encoder
 from src.data.data_handler import (
@@ -11,6 +11,8 @@ from src.data.data_handler import (
     LepusStratifiedKFoldDataModule,
     StratifiedKFoldLoop,
 )
+
+from pytorch_lightning.loggers import WandbLogger
 
 seed_everything(42)
 
@@ -25,7 +27,7 @@ if __name__ == "__main__":
     WIDTH = 200
     SCALE_HEIGHT = False
     BATCH_SIZE = 2
-    NUM_FOLDS = 1
+    NUM_FOLDS = 5
     model = SampleModel()
     x_encoder = partial(
         get_image_encoder(
@@ -39,6 +41,9 @@ if __name__ == "__main__":
         batch_size=BATCH_SIZE,
         n_splits=NUM_FOLDS,
     )
+
+    wandb_logger = WandbLogger()
+
     trainer = Trainer(
         max_epochs=10,
         limit_train_batches=2,
@@ -48,6 +53,7 @@ if __name__ == "__main__":
         devices=1,
         accelerator="auto",
         strategy="ddp",
+        logger=wandb_logger,
     )
 
     EXPORT_PATH = Path("model_checkpoints")

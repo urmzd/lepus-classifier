@@ -117,6 +117,7 @@ threadpoolctl==3.1.0
 tifffile==2022.2.9
 tomli==2.0.1
 torch==1.11.0
+torch-tb-profiler==0.4.0
 torchmetrics==0.7.3
 tornado==6.1
 tqdm==4.63.1
