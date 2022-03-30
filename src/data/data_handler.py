@@ -1,10 +1,9 @@
 from copy import deepcopy
 from dataclasses import dataclass
+from loguru import logger
 import numpy as np
 from pathlib import Path
 from torch.utils.data import DataLoader
-
-
 import pytorch_lightning as pl
 from sklearn.model_selection import (
     StratifiedShuffleSplit,
@@ -13,16 +12,16 @@ from sklearn.model_selection import (
 from sklearn.model_selection import StratifiedKFold, train_test_split
 import torch
 from torch.nn import functional as F
+from torch.utils.data import Dataset
 from torchmetrics import Accuracy
 
 from typing import Any, Dict, List, Optional, Type
-from torch.utils.data import Dataset
 from abc import ABC, abstractmethod
 from pytorch_lightning.loops.base import Loop
 from pytorch_lightning.loops.fit_loop import FitLoop
 from pytorch_lightning.trainer.states import TrainerFn
-from src.data.data_processing import get_target_encoder
 
+from src.data.data_processing import get_target_encoder
 from src.data.data_types import TargetEncoder, FeaturesEncoder
 from src.data.data_extractor import download_image, get_data, get_image
 
@@ -154,8 +153,26 @@ class LepusStratifiedKFoldDataModule(StratifiedKFoldDataModule):
         super().__init__()
 
 
+class EnsembleVotingModel(pl.LightningModule):
+    def __init__(
+        self, model_cls: Type[pl.LightningModule], checkpoint_paths: List[Path]
+    ) -> None:
+        super().__init__()
+        self.models = torch.nn.ModuleList(
+            [model_cls.load_from_checkpoint(p) for p in checkpoint_paths]
+        )
+        self.test_acc = Accuracy()
+
+    def test_step(self, batch: Any, dataloader_idx: int = 0) -> None:
+        logits = torch.stack([m(batch[0]) for m in self.models]).mean(0)
+        loss = F.nll_loss(logits, batch[1])
+        self.test_acc(logits, batch[1])
+        self.log("test_acc", self.test_acc)
+        self.log("test_loss", loss)
+
+
 class StratifiedKFoldLoop(Loop):
-    def __init__(self, num_folds: int, export_path: str) -> None:
+    def __init__(self, num_folds: int, export_path: Path) -> None:
         super().__init__()
         self.num_folds = num_folds
         self.current_fold = 0
@@ -175,6 +192,7 @@ class StratifiedKFoldLoop(Loop):
         )
 
     def on_advance_start(self, *args: Any, **kwargs: Any) -> None:
+        logger.info(f"STARTING FOLD {self.current_fold}")
         assert isinstance(self.trainer.datamodule, StratifiedKFoldDataModule)
         self.trainer.datamodule.setup_fold_using_index(self.current_fold)
 
@@ -187,12 +205,8 @@ class StratifiedKFoldLoop(Loop):
         self.current_fold += 1
 
     def on_advance_end(self) -> None:
-        # Create parent path.
-        Path("model_checkpoints").mkdir(parents=True, exist_ok=True)
-
         self.trainer.save_checkpoint(
-            Path(self.export_path)
-            / f"model_checkpoints/model.fold-{self.current_fold}.pt"
+            self.export_path / f"model.fold-{self.current_fold}.pt"
         )
         self.trainer.lightning_module.load_state_dict(self.lighning_module_state_dict)
         self.trainer.strategy.setup_optimizers(self.trainer)
@@ -203,7 +217,7 @@ class StratifiedKFoldLoop(Loop):
 
     def on_run_end(self) -> None:
         checkpoint_paths = [
-            Path(self.export_path) / f"model_checkpoints/model.fold-{fold + 1}.pt"
+            self.export_path / f"model.fold-{fold + 1}.pt"
             for fold in range(self.num_folds)
         ]
         voting_model = EnsembleVotingModel(
@@ -238,24 +252,6 @@ class StratifiedKFoldLoop(Loop):
         return self.__dict__[key]
 
 
-class EnsembleVotingModel(pl.LightningModule):
-    def __init__(
-        self, model_cls: Type[pl.LightningModule], checkpoint_paths: List[Path]
-    ) -> None:
-        super().__init__()
-        self.models = torch.nn.ModuleList(
-            [model_cls.load_from_checkpoint(p) for p in checkpoint_paths]
-        )
-        self.test_acc = Accuracy()
-
-    def test_step(self, batch: Any) -> None:
-        logits = torch.stack([m(batch[0]) for m in self.models]).mean(0)
-        loss = F.nll_loss(logits, batch[1])
-        self.test_acc(logits, batch[1])
-        self.log("test_acc", self.test_acc)
-        self.log("test_loss", loss)
-
-
 class SampleModel(pl.LightningModule):
     def __init__(self, n_targets=2) -> None:
         super().__init__()
@@ -267,6 +263,7 @@ class SampleModel(pl.LightningModule):
         self.layer_4 = torch.nn.Flatten(1, -1)
         self.layer_5 = torch.nn.Linear(15 * 50 * 50, n_targets)
         self.layer_6 = torch.nn.LogSoftmax()
+        self.test_acc = Accuracy()
 
     def forward(self, x):
         x_1 = self.layer_1(x)
@@ -278,15 +275,23 @@ class SampleModel(pl.LightningModule):
         result = self.layer_6(x_6)
         return result
 
-    def training_step(self, batch, batch_idx) -> None:
+    def training_step(self, batch, batch_idx) -> torch.Tensor:
         x, y = batch
-        y_hat = self(x)
+        y_hat = self.forward(x)
         loss = F.cross_entropy(y_hat, y)
         return loss
 
-    def validation_step(self, batch, batch_idx) -> None:
+    def test_step(self, batch, batch_idx) -> None:
         x, y = batch
-        y_hat = self(x)
+        y_hat = self.forward(x)
+        loss = F.cross_entropy(y_hat, y)
+        self.test_acc(y_hat, y)
+        self.log("test_acc", self.test_acc)
+        self.log("test_loss", loss)
+
+    def validation_step(self, batch, batch_idx) -> torch.Tensor:
+        x, y = batch
+        y_hat = self.forward(x)
         val_loss = F.cross_entropy(y_hat, y)
         return val_loss
 

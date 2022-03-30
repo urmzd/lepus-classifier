@@ -1,4 +1,5 @@
 from functools import partial
+from os import mkdir
 import sys
 from pytorch_lightning import seed_everything, Trainer
 from pathlib import Path
@@ -48,8 +49,12 @@ if __name__ == "__main__":
         accelerator="auto",
         strategy="ddp",
     )
+
+    EXPORT_PATH = Path("model_checkpoints")
+    EXPORT_PATH.mkdir(exist_ok=True, parents=True)
+
     internal_fit_loop = trainer.fit_loop
-    trainer.fit_loop = StratifiedKFoldLoop(NUM_FOLDS, export_path="./")
+    trainer.fit_loop = StratifiedKFoldLoop(NUM_FOLDS, export_path=EXPORT_PATH)
     trainer.fit_loop.connect(internal_fit_loop)
     trainer.fit(model, datamodule)
     logger.info(trainer.logged_metrics)
