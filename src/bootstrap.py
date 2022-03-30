@@ -57,4 +57,3 @@ if __name__ == "__main__":
     trainer.fit_loop = StratifiedKFoldLoop(NUM_FOLDS, export_path=EXPORT_PATH)
     trainer.fit_loop.connect(internal_fit_loop)
     trainer.fit(model, datamodule)
-    logger.info(trainer.logged_metrics)

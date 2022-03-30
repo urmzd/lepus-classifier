@@ -165,7 +165,7 @@ class EnsembleVotingModel(pl.LightningModule):
 
     def test_step(self, batch: Any, dataloader_idx: int = 0) -> None:
         logits = torch.stack([m(batch[0]) for m in self.models]).mean(0)
-        loss = F.nll_loss(logits, batch[1])
+        loss = F.cross_entropy(logits, batch[1])
         self.test_acc(logits, batch[1])
         self.log("test_acc", self.test_acc)
         self.log("test_loss", loss)
