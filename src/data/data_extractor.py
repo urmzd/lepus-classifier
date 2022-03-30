@@ -2,17 +2,11 @@ from pathlib import Path
 import pandas as pd
 import re
 import requests
-import matplotlib.pyplot as plt
 import cv2
-from custom_types import (
-    Image,
-    PreEncodedDataSet,
-    PreEncodedImages,
-    PreEncodedLabels,
-)
+from src.data.data_types import Image
 
 
-def get_data(data_path: str) -> pd.DataFrame:
+def get_data(data_path: Path) -> pd.DataFrame:
     df = pd.read_csv(data_path, usecols=range(2))
     if isinstance(df, pd.DataFrame):
         return df
@@ -20,7 +14,7 @@ def get_data(data_path: str) -> pd.DataFrame:
     raise Exception("This should never happen.")
 
 
-def download_image(link: str, image_folder_path: str) -> Path:
+def download_image(link: str, image_folder_path: Path) -> Path:
     """Downloads the image from the specified link to the given folder path.
 
     View  : https://regex101.com/r/3bhDMM/1
@@ -39,10 +33,9 @@ def download_image(link: str, image_folder_path: str) -> Path:
     else:
         file_name = regex_matches.group(1)
 
-    content_path = Path(image_folder_path)
-    content_path.mkdir(parents=True, exist_ok=True)
+    image_folder_path.mkdir(parents=True, exist_ok=True)
 
-    file_path = content_path / file_name
+    file_path = image_folder_path / file_name
 
     if file_path.exists():
         return file_path
@@ -59,23 +52,7 @@ def download_image(link: str, image_folder_path: str) -> Path:
     return file_path
 
 
-def get_image(file_path: Path, show=False) -> Image:
+def get_image(file_path: Path) -> Image:
     image = cv2.imread(str(file_path))
 
-    if show:
-        plt.imshow(image)
-
     return Image(image)
-
-
-def get_pre_encoded_dataset(
-    data: pd.DataFrame, image_folder_path: str
-) -> PreEncodedDataSet:
-    y = data.iloc[:, 0].to_numpy()
-    y = y.reshape(-1, 1)
-
-    x_links = data.iloc[:, 1].tolist()
-    x_paths = [download_image(link, image_folder_path) for link in x_links]
-    x = [get_image(path) for path in x_paths]
-
-    return PreEncodedDataSet(PreEncodedImages(x), PreEncodedLabels(y))

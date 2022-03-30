@@ -1,20 +1,65 @@
-from custom_types import DataSet
-from data_retrieval import get_data, get_pre_encoded_dataset
-from processing import get_processed_x_y, get_x_y_preprocessors
+from functools import partial
+import sys
+from pytorch_lightning import seed_everything, Trainer
+from pathlib import Path
+from loguru import logger
+import wandb
 
+from src.data.data_processing import get_image_encoder
+from src.data.data_handler import (
+    SampleModel,
+    LepusStratifiedKFoldDataModule,
+    StratifiedKFoldLoop,
+)
 
-def get_encoded_x_y(
-    image_folder_path: str,
-    data_path: str,
-    scale_height: bool,
-    desired_width: int,
-    desired_height: int,
-) -> DataSet:
-    data = get_data(data_path=data_path)
-    images, labels = get_pre_encoded_dataset(data, image_folder_path=image_folder_path)
-    x_encoder, y_encoder = get_x_y_preprocessors(
-        images, labels, desired_height, desired_width, scale_height
+from pytorch_lightning.loggers import WandbLogger
+
+seed_everything(42)
+
+if __name__ == "__main__":
+    logger.remove()
+    LOG_LEVEL = "INFO"
+    logger.add(sys.stderr, level=LOG_LEVEL)
+    seed_everything(42)
+    DATA_MANFIEST_PATH = Path("./resources/data.csv")
+    IMAGE_FOLDER_PATH = Path("/tmp/images")
+    HEIGHT = 200
+    WIDTH = 200
+    SCALE_HEIGHT = False
+    BATCH_SIZE = 2
+    NUM_FOLDS = 5
+    model = SampleModel()
+    x_encoder = partial(
+        get_image_encoder(
+            desired_height=HEIGHT, desired_width=WIDTH, scale_height=SCALE_HEIGHT
+        )
     )
-    dataset = get_processed_x_y(images, labels, x_encoder, y_encoder)
+    datamodule = LepusStratifiedKFoldDataModule(
+        data_manifest_path=DATA_MANFIEST_PATH,
+        image_folder_path=IMAGE_FOLDER_PATH,
+        transform_features=x_encoder,
+        batch_size=BATCH_SIZE,
+        n_splits=NUM_FOLDS,
+    )
 
-    return dataset
+    wandb_logger = WandbLogger()
+
+    trainer = Trainer(
+        max_epochs=10,
+        limit_train_batches=2,
+        limit_val_batches=2,
+        limit_test_batches=2,
+        num_sanity_val_steps=0,
+        devices=1,
+        accelerator="auto",
+        strategy="ddp",
+        logger=wandb_logger,
+    )
+
+    EXPORT_PATH = Path("model_checkpoints")
+    EXPORT_PATH.mkdir(exist_ok=True, parents=True)
+
+    internal_fit_loop = trainer.fit_loop
+    trainer.fit_loop = StratifiedKFoldLoop(NUM_FOLDS, export_path=EXPORT_PATH)
+    trainer.fit_loop.connect(internal_fit_loop)
+    trainer.fit(model, datamodule)
