@@ -61,7 +61,9 @@ def bootstrap(
     batch_size=BATCH_SIZE,
     num_folds=NUM_FOLDS,
     export_path=EXPORT_PATH,
-    trainer_factory: TrainerFactory = TrainerFactory()
+    trainer_factory: TrainerFactory = TrainerFactory(
+        logger=WandbLogger()
+    )
 ):
     export_path.mkdir(exist_ok=True, parents=True)
     seed_everything(42)
@@ -81,8 +83,6 @@ def bootstrap(
         n_splits=num_folds,
     )
 
-    wandb_logger = WandbLogger()
-    trainer_factory.logger = wandb_logger
     trainer = trainer_factory.get_trainer()
 
     internal_fit_loop = trainer.fit_loop
