@@ -263,8 +263,13 @@ class BasicModel(pl.LightningModule):
         self.layer_4 = torch.nn.Flatten(1, -1)
         self.layer_5 = torch.nn.Linear(15 * 50 * 50, n_targets)
         self.layer_6 = torch.nn.LogSoftmax()
-        self.test_acc = Accuracy()
+
+
+        # Logs
         self.train_acc = Accuracy()
+        self.val_acc = Accuracy()
+        self.test_acc = Accuracy()
+
         self.save_hyperparameters()
 
     def forward(self, x):
@@ -298,6 +303,8 @@ class BasicModel(pl.LightningModule):
         x, y = batch
         y_hat = self.forward(x)
         val_loss = F.cross_entropy(y_hat, y)
+        self.log("val_acc", self.val_acc, on_epoch=True, on_step=False)
+        self.log("val_loss", val_loss, on_epoch=True, on_step=False)
         return val_loss
 
     def configure_optimizers(self):

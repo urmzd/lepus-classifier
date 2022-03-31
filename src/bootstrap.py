@@ -63,7 +63,7 @@ def bootstrap(
     num_folds=NUM_FOLDS,
     export_path=EXPORT_PATH,
     trainer_factory: TrainerFactory = TrainerFactory(
-        logger=WandbLogger()
+        logger=WandbLogger(project="rabbit-classifier")
     )
 ):
     export_path.mkdir(exist_ok=True, parents=True)
