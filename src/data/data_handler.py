@@ -252,7 +252,7 @@ class StratifiedKFoldLoop(Loop):
         return self.__dict__[key]
 
 
-class SampleModel(pl.LightningModule):
+class BasicModel(pl.LightningModule):
     def __init__(self, n_targets=2) -> None:
         super().__init__()
         # O: H/2, W/2

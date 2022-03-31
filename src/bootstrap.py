@@ -7,7 +7,7 @@ from loguru import logger
 
 from src.data.data_processing import get_image_encoder
 from src.data.data_handler import (
-    SampleModel,
+    BasicModel,
     LepusStratifiedKFoldDataModule,
     StratifiedKFoldLoop,
 )
@@ -52,7 +52,7 @@ NUM_FOLDS = 5
 EXPORT_PATH = Path("model_checkpoints")
 
 def bootstrap(
-    model=SampleModel(),
+    model=BasicModel(),
     log_level=LOG_LEVEL,
     data_manfiest_path=DATA_MANFIEST_PATH,
     image_folder_path=IMAGE_FOLDER_PATH,
@@ -66,7 +66,6 @@ def bootstrap(
         logger=WandbLogger()
     )
 ):
-    wandb.login()
     export_path.mkdir(exist_ok=True, parents=True)
     seed_everything(42)
     logger.remove()
