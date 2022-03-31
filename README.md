@@ -23,7 +23,7 @@ Data was retrieved and located in [resources/data.txt](resources/data.txt)
 
 3. Use the bootstrap function to start training your custom model. 
 ```
-import src.bootstrap
+import src.bootstrap import bootstrap
 
 bootstrap()
 ```
