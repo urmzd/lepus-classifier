@@ -167,8 +167,8 @@ class EnsembleVotingModel(pl.LightningModule):
         logits = torch.stack([m(batch[0]) for m in self.models]).mean(0)
         loss = F.cross_entropy(logits, batch[1])
         self.test_acc(logits, batch[1])
-        self.log("test_acc", self.test_acc)
-        self.log("test_loss", loss)
+        self.log("test_acc", self.test_acc, on_step=True, on_epoch=True)
+        self.log("test_loss", loss, on_step=True, on_epoch=True)
 
 
 class StratifiedKFoldLoop(Loop):
@@ -282,8 +282,8 @@ class BasicModel(pl.LightningModule):
         y_hat = self.forward(x)
         loss = F.cross_entropy(y_hat, y)
         self.train_acc(y_hat, y)
-        self.log("train_acc", self.train_acc)
-        self.log("train_loss", loss)
+        self.log("train_acc", self.train_acc, on_epoch=True, on_step=True)
+        self.log("train_loss", loss, on_epoch=True, on_step=False)
         return loss
 
     def test_step(self, batch, batch_idx) -> None:
@@ -291,8 +291,8 @@ class BasicModel(pl.LightningModule):
         y_hat = self.forward(x)
         loss = F.cross_entropy(y_hat, y)
         self.test_acc(y_hat, y)
-        self.log("test_acc", self.test_acc)
-        self.log("test_loss", loss)
+        self.log("test_acc", self.test_acc, on_epoch=True, on_step=False)
+        self.log("test_loss", loss, on_epoch=True, on_step=False)
 
     def validation_step(self, batch, batch_idx) -> torch.Tensor:
         x, y = batch
