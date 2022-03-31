@@ -1,9 +1,9 @@
+from dataclasses import dataclass
 from functools import partial
 import sys
 from pytorch_lightning import seed_everything, Trainer
 from pathlib import Path
 from loguru import logger
-from src import data
 
 from src.data.data_processing import get_image_encoder
 from src.data.data_handler import (
@@ -11,30 +11,34 @@ from src.data.data_handler import (
     LepusStratifiedKFoldDataModule,
     StratifiedKFoldLoop,
 )
+from typing import Optional
 
 from pytorch_lightning.loggers import WandbLogger
 
-@data
+@dataclass
 class TrainerFactory:
     strategy = "ddp"
     max_epochs = 10
     devices = 1
-    logger: WandbLogger
+    logger: Optional[WandbLogger] = None
 
     def get_trainer(self):
-        trainer = Trainer(
-            max_epochs=self.max_epochs,
-            limit_train_batches=2,
-            limit_val_batches=2,
-            limit_test_batches=2,
-            num_sanity_val_steps=0,
-            devices=self.devices,
-            accelerator="auto",
-            strategy=self.strategy,
-            logger=self.logger,
-        )
+        if self.logger:
+            trainer = Trainer(
+                max_epochs=self.max_epochs,
+                limit_train_batches=2,
+                limit_val_batches=2,
+                limit_test_batches=2,
+                num_sanity_val_steps=0,
+                devices=self.devices,
+                accelerator="auto",
+                strategy=self.strategy,
+                logger=self.logger,
+            )
 
-        return trainer
+            return trainer
+        else:
+            raise Exception("Must specify logging entity.")
 
 LOG_LEVEL = "INFO"
 DATA_MANFIEST_PATH = Path("./resources/data.csv")
