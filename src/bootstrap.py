@@ -3,6 +3,7 @@ import sys
 from pytorch_lightning import seed_everything, Trainer
 from pathlib import Path
 from loguru import logger
+from src import data
 
 from src.data.data_processing import get_image_encoder
 from src.data.data_handler import (
@@ -12,6 +13,28 @@ from src.data.data_handler import (
 )
 
 from pytorch_lightning.loggers import WandbLogger
+
+@data
+class TrainerFactory:
+    strategy = "ddp"
+    max_epochs = 10
+    devices = 1
+    logger: WandbLogger
+
+    def get_trainer(self):
+        trainer = Trainer(
+            max_epochs=self.max_epochs,
+            limit_train_batches=2,
+            limit_val_batches=2,
+            limit_test_batches=2,
+            num_sanity_val_steps=0,
+            devices=self.devices,
+            accelerator="auto",
+            strategy=self.strategy,
+            logger=self.logger,
+        )
+
+        return trainer
 
 LOG_LEVEL = "INFO"
 DATA_MANFIEST_PATH = Path("./resources/data.csv")
@@ -33,7 +56,8 @@ def bootstrap(
     scale_height=SCALE_HEIGHT,
     batch_size=BATCH_SIZE,
     num_folds=NUM_FOLDS,
-    export_path=EXPORT_PATH
+    export_path=EXPORT_PATH,
+    trainer_factory: TrainerFactory = TrainerFactory()
 ):
     export_path.mkdir(exist_ok=True, parents=True)
     seed_everything(42)
@@ -54,19 +78,8 @@ def bootstrap(
     )
 
     wandb_logger = WandbLogger()
-
-    trainer = Trainer(
-        max_epochs=10,
-        limit_train_batches=2,
-        limit_val_batches=2,
-        limit_test_batches=2,
-        num_sanity_val_steps=0,
-        devices=1,
-        accelerator="auto",
-        strategy="ddp",
-        logger=wandb_logger,
-    )
-
+    trainer_factory.logger = wandb_logger
+    trainer = trainer_factory.get_trainer()
 
     internal_fit_loop = trainer.fit_loop
     trainer.fit_loop = StratifiedKFoldLoop(num_folds, export_path=export_path)
