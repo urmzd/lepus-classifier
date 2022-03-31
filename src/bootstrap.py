@@ -17,9 +17,9 @@ from pytorch_lightning.loggers import WandbLogger
 
 @dataclass
 class TrainerFactory:
-    strategy = "ddp"
-    max_epochs = 10
-    devices = 1
+    strategy: str = "ddp"
+    max_epochs: int = 10
+    devices: int = 1
     logger: Optional[WandbLogger] = None
 
     def get_trainer(self):
