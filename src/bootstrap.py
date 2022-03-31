@@ -14,6 +14,7 @@ from src.data.data_handler import (
 from typing import Optional
 
 from pytorch_lightning.loggers import WandbLogger
+import wandb
 
 @dataclass
 class TrainerFactory:
@@ -65,6 +66,7 @@ def bootstrap(
         logger=WandbLogger()
     )
 ):
+    wandb.login()
     export_path.mkdir(exist_ok=True, parents=True)
     seed_everything(42)
     logger.remove()
@@ -89,6 +91,8 @@ def bootstrap(
     trainer.fit_loop = StratifiedKFoldLoop(num_folds, export_path=export_path)
     trainer.fit_loop.connect(internal_fit_loop)
     trainer.fit(model, datamodule)
+
+    wandb.finish()
 
 
 if __name__ == "__main__":
