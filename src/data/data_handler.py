@@ -167,8 +167,8 @@ class EnsembleVotingModel(pl.LightningModule):
         logits = torch.stack([m(batch[0]) for m in self.models]).mean(0)
         loss = F.cross_entropy(logits, batch[1])
         self.test_acc(logits, batch[1])
-        self.log("test_acc", self.test_acc, on_step=True, on_epoch=True)
-        self.log("test_loss", loss, on_step=True, on_epoch=True)
+        self.log("test_acc", self.test_acc, on_step=False, on_epoch=True)
+        self.log("test_loss", loss, on_step=False, on_epoch=True)
 
 
 class StratifiedKFoldLoop(Loop):
@@ -264,7 +264,6 @@ class BasicModel(pl.LightningModule):
         self.layer_5 = torch.nn.Linear(15 * 50 * 50, n_targets)
         self.layer_6 = torch.nn.LogSoftmax()
 
-
         # Logs
         self.train_acc = Accuracy()
         self.val_acc = Accuracy()
@@ -287,7 +286,7 @@ class BasicModel(pl.LightningModule):
         y_hat = self.forward(x)
         loss = F.cross_entropy(y_hat, y)
         self.train_acc(y_hat, y)
-        self.log("train_acc", self.train_acc, on_epoch=True, on_step=True)
+        self.log("train_acc", self.train_acc, on_epoch=True, on_step=False)
         self.log("train_loss", loss, on_epoch=True, on_step=False)
         return loss
 
@@ -303,6 +302,7 @@ class BasicModel(pl.LightningModule):
         x, y = batch
         y_hat = self.forward(x)
         val_loss = F.cross_entropy(y_hat, y)
+        self.val_acc(y_hat, y)
         self.log("val_acc", self.val_acc, on_epoch=True, on_step=False)
         self.log("val_loss", val_loss, on_epoch=True, on_step=False)
         return val_loss
