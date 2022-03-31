@@ -23,7 +23,6 @@ BATCH_SIZE = 2
 NUM_FOLDS = 5
 EXPORT_PATH = Path("model_checkpoints")
 
-
 def bootstrap(
     model=SampleModel(),
     log_level=LOG_LEVEL,
@@ -73,3 +72,7 @@ def bootstrap(
     trainer.fit_loop = StratifiedKFoldLoop(num_folds, export_path=export_path)
     trainer.fit_loop.connect(internal_fit_loop)
     trainer.fit(model, datamodule)
+
+
+if __name__ == "__main__":
+    bootstrap()
