@@ -14,6 +14,7 @@ import torch
 from torch.nn import functional as F
 from torch.utils.data import Dataset
 from torchmetrics import Accuracy
+from torchmetrics.functional import accuracy
 
 from typing import Any, Dict, List, Optional, Type
 from abc import ABC, abstractmethod
@@ -262,7 +263,6 @@ class BasicModel(pl.LightningModule):
         self.layer_3 = torch.nn.ReLU()
         self.layer_4 = torch.nn.Flatten(1, -1)
         self.layer_5 = torch.nn.Linear(15 * 50 * 50, n_targets)
-        self.layer_6 = torch.nn.LogSoftmax()
 
         # Logs
         self.train_acc = Accuracy()
@@ -277,8 +277,7 @@ class BasicModel(pl.LightningModule):
         x_3 = self.layer_3(x_2)
         x_4 = self.layer_4(x_3)
         x_5 = self.layer_5(x_4)
-        x_6 = self.layer_6(x_5)
-        result = self.layer_6(x_6)
+        result = x_5
         return result
 
     def training_step(self, batch, batch_idx) -> torch.Tensor:
