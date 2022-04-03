@@ -66,9 +66,8 @@ def bootstrap(
     batch_size=BATCH_SIZE,
     num_folds=NUM_FOLDS,
     export_path=EXPORT_PATH,
-    trainer_factory: TrainerFactory = TrainerFactory(
-        logger=WandbLogger(project="rabbit-classifier")
-    ),
+    wandb_logger: WandbLogger = WandbLogger(project="rabbit-classifier"),
+    trainer_factory: TrainerFactory = TrainerFactory(),
     seed_no: Optional[bool] = 42,
 ):
     export_path.mkdir(exist_ok=True, parents=True)
@@ -78,6 +77,7 @@ def bootstrap(
 
     logger.remove()
     logger.add(sys.stderr, level=log_level)
+    trainer_factory.set_logger(wandb_logger)
     x_encoder = partial(
         get_image_encoder(
             desired_height=height, desired_width=width, scale_height=scale_height
@@ -98,8 +98,6 @@ def bootstrap(
     trainer.fit_loop = StratifiedKFoldLoop(num_folds, export_path=export_path)
     trainer.fit_loop.connect(internal_fit_loop)
     trainer.fit(model, datamodule)
-    wandb.log({"hyperparameters": BasicModel.hparams})
-
     wandb.finish()
 
 
