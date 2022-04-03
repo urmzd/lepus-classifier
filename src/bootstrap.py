@@ -16,6 +16,7 @@ from typing import Optional
 from pytorch_lightning.loggers import WandbLogger
 import wandb
 
+
 @dataclass
 class TrainerFactory:
     strategy: str = "ddp"
@@ -27,9 +28,9 @@ class TrainerFactory:
         if self.logger:
             trainer = Trainer(
                 max_epochs=self.max_epochs,
-                limit_train_batches=2,
-                limit_val_batches=2,
-                limit_test_batches=2,
+                limit_train_batches=None,
+                limit_val_batches=None,
+                limit_test_batches=None,
                 num_sanity_val_steps=0,
                 devices=self.devices,
                 accelerator="auto",
@@ -41,6 +42,7 @@ class TrainerFactory:
         else:
             raise Exception("Must specify logging entity.")
 
+
 LOG_LEVEL = "INFO"
 DATA_MANFIEST_PATH = Path("./resources/data.csv")
 IMAGE_FOLDER_PATH = Path("/tmp/images")
@@ -50,6 +52,7 @@ SCALE_HEIGHT = False
 BATCH_SIZE = 2
 NUM_FOLDS = 5
 EXPORT_PATH = Path("model_checkpoints")
+
 
 def bootstrap(
     model=BasicModel(),
@@ -64,7 +67,7 @@ def bootstrap(
     export_path=EXPORT_PATH,
     trainer_factory: TrainerFactory = TrainerFactory(
         logger=WandbLogger(project="rabbit-classifier")
-    )
+    ),
 ):
     export_path.mkdir(exist_ok=True, parents=True)
     seed_everything(42)
