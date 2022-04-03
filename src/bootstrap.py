@@ -68,7 +68,7 @@ def bootstrap(
     export_path=EXPORT_PATH,
     wandb_logger: WandbLogger = WandbLogger(project="rabbit-classifier"),
     trainer_factory: TrainerFactory = TrainerFactory(),
-    seed_no: Optional[bool] = 42,
+    seed_no: Optional[int] = 42
 ):
     export_path.mkdir(exist_ok=True, parents=True)
 
