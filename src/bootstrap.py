@@ -98,7 +98,7 @@ def bootstrap(
     trainer.fit_loop = StratifiedKFoldLoop(num_folds, export_path=export_path)
     trainer.fit_loop.connect(internal_fit_loop)
     trainer.fit(model, datamodule)
-    logger.log({"hyperparameters": BasicModel.hparams})
+    wandb.log({"hyperparameters": BasicModel.hparams})
 
     wandb.finish()
 
