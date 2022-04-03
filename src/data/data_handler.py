@@ -320,8 +320,8 @@ class BasicModel(pl.LightningModule):
         self.test_acc.update(logits, y)
         self.test_conf_mat.update(logits, y)
 
-        self.log("test_acc", self.test_acc, on_epoch=True, on_step=False)
-        self.log("test_loss", loss, on_epoch=True, on_step=False)
+        self.log("test_acc", self.test_acc, on_epoch=True, on_step=True)
+        self.log("test_loss", loss, on_epoch=True, on_step=True)
 
     def _log_conf_mat(self, name: str, conf_mat: ConfusionMatrix) -> None:
         fig = px.imshow(conf_mat.compute().cpu().detach().numpy(), text_auto=True)
