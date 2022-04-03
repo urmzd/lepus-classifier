@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
+from types import new_class
 from typing import Any, Dict, List, Optional, Type
 
 import numpy as np
@@ -257,10 +258,10 @@ class StratifiedKFoldLoop(Loop):
 class BasicModel(pl.LightningModule):
     def __init__(self, n_targets=2, learning_rate=0.02) -> None:
         super().__init__()
+        # Hyper Parameters
         self.learning_rate = learning_rate
-        # O: H/2, W/2
+
         self.layer_1 = torch.nn.Conv2d(1, 15, 2, 2)
-        # O: H/2, W/2
         self.layer_2 = torch.nn.MaxPool2d(2, 2)
         self.layer_3 = torch.nn.ReLU()
         self.layer_4 = torch.nn.Flatten(1, -1)
@@ -273,8 +274,11 @@ class BasicModel(pl.LightningModule):
         self.test_acc = Accuracy()
 
         self.train_conf_mat = ConfusionMatrix(num_classes=n_targets)
+        self.val_conf_mat = ConfusionMatrix(num_classes=n_targets)
+        self.test_conf_mat = ConfusionMatrix(num_classes=n_targets)
 
         self.save_hyperparameters()
+        self.log("hyperparameters", self.hparams)
 
     def forward(self, x):
         x_1 = self.layer_1(x)
@@ -290,25 +294,34 @@ class BasicModel(pl.LightningModule):
         logits = self.forward(x)
         loss = F.nll_loss(logits, y)
 
-        self.train_acc(logits, y)
-        self.train_conf_mat(logits, y)
+        self.train_acc.update(logits, y)
+        self.train_conf_mat.update(logits, y)
 
-        self.log("train_acc", self.train_acc, on_epoch=True, on_step=False)
-        self.log("train_loss", loss, on_epoch=True, on_step=False)
+        self.log("train_acc", self.train_acc, on_epoch=True, on_step=True)
+        self.log("train_loss", loss, on_epoch=True, on_step=True)
         return loss
 
+    def _log_conf_mat(self, name: str, conf_mat: ConfusionMatrix) -> None:
+        fig = px.imshow(conf_mat.compute().cpu().detach().numpy(), text_auto=True)
+        self.log(name, fig)
+        conf_mat.reset()
+
     def on_train_epoch_end(self) -> None:
-        fig = px.imshow(
-            self.train_conf_mat.compute().cpu().detach().numpy(), text_auto=True
-        )
-        wandb.log({"train_conf_mat": fig})
-        self.train_conf_mat.reset()
+        self._log_conf_mat("train_conf_mat", self.train_conf_mat)
+
+    def on_validation_epoch_end(self) -> None:
+        self._log_conf_mat("val_conf_mat", self.val_conf_mat)
+
+    def on_test_epoch_end(self) -> None:
+        self._log_conf_mat("test_conf_mat", self.test_conf_mat)
 
     def test_step(self, batch, batch_idx) -> None:
         x, y = batch
         logits = self.forward(x)
         loss = F.nll_loss(logits, y)
-        self.test_acc(logits, y)
+
+        self.test_acc.update(logits, y)
+        self.test_conf_mat.update(logits, y)
 
         self.log("test_acc", self.test_acc, on_epoch=True, on_step=False)
         self.log("test_loss", loss, on_epoch=True, on_step=False)
