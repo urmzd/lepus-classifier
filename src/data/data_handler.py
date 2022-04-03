@@ -1,31 +1,30 @@
+from abc import ABC, abstractmethod
 from copy import deepcopy
 from dataclasses import dataclass
-from loguru import logger
-import numpy as np
 from pathlib import Path
-from torch.utils.data import DataLoader
-import pytorch_lightning as pl
-from sklearn.model_selection import (
-    StratifiedShuffleSplit,
-    train_test_split,
-)
-from sklearn.model_selection import StratifiedKFold, train_test_split
-import torch
-from torch.nn import functional as F
-from torch.utils.data import Dataset
-from torchmetrics import Accuracy, ConfusionMatrix
-from torchmetrics.functional import accuracy
-
 from typing import Any, Dict, List, Optional, Type
-from abc import ABC, abstractmethod
+
+import numpy as np
+import pytorch_lightning as pl
+import seaborn as sns
+import torch
+import wandb
+from loguru import logger
 from pytorch_lightning.loops.base import Loop
 from pytorch_lightning.loops.fit_loop import FitLoop
 from pytorch_lightning.trainer.states import TrainerFn
-import wandb
-
-from src.data.data_processing import get_target_encoder
-from src.data.data_types import TargetEncoder, FeaturesEncoder
+from sklearn.model_selection import (
+    StratifiedKFold,
+    StratifiedShuffleSplit,
+    train_test_split,
+)
 from src.data.data_extractor import download_image, get_data, get_image
+from src.data.data_processing import get_target_encoder
+from src.data.data_types import FeaturesEncoder, TargetEncoder
+from torch.nn import functional as F
+from torch.utils.data import DataLoader, Dataset
+from torchmetrics import Accuracy, ConfusionMatrix
+from torchmetrics.functional import accuracy
 
 
 class StratifiedKFoldDataModule(pl.LightningDataModule, ABC):
@@ -93,19 +92,17 @@ class LepusStratifiedKFoldDataModule(StratifiedKFoldDataModule):
         else:
             self.target_encoder = None
 
-        # 80 / 20
         train_set, test_set = train_test_split(self.data, train_size=self.train_size)
         self.train_dataset, self.test_dataset = train_set, test_set
 
         features, targets = train_set[:, 1], train_set[:, 0]
 
         if self.n_splits >= 2:
-            # 80 / 20 * 80 / 20
             splitter = StratifiedKFold(self.n_splits)
-            self.splits = [split for split in splitter.split(features, targets)]
         else:
             splitter = StratifiedShuffleSplit(1, test_size=0.8)
-            self.splits = [split for split in splitter.split(features, targets)]
+
+        self.splits = [split for split in splitter.split(features, targets)]
 
     def setup_fold_using_index(self, fold_index: int) -> None:
         train_indices, val_indices = self.splits[fold_index]
@@ -260,6 +257,7 @@ class StratifiedKFoldLoop(Loop):
 class BasicModel(pl.LightningModule):
     def __init__(self, n_targets=2, learning_rate=0.02) -> None:
         super().__init__()
+        self.learning_rate = learning_rate
         # O: H/2, W/2
         self.layer_1 = torch.nn.Conv2d(1, 15, 2, 2)
         # O: H/2, W/2
@@ -298,6 +296,13 @@ class BasicModel(pl.LightningModule):
         self.log("train_acc", self.train_acc, on_epoch=True, on_step=False)
         self.log("train_loss", loss, on_epoch=True, on_step=False)
         return loss
+
+    def on_train_epoch_end(self) -> None:
+        conf_mat_plot = sns.heatmap(
+            self.train_conf_mat.compute().cpu().detach().numpy()
+        )
+        wandb.log({"train_conf_mat": conf_mat_plot})
+        self.train_conf_mat.reset()
 
     def test_step(self, batch, batch_idx) -> None:
         x, y = batch
