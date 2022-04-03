@@ -284,7 +284,7 @@ class BasicModel(pl.LightningModule):
         x_3 = self.layer_3(x_2)
         x_4 = self.layer_4(x_3)
         x_5 = self.layer_5(x_4)
-        result = x_5
+        result = self.softmax_layer(x_5)
         return result
 
     def training_step(self, batch, batch_idx) -> torch.Tensor:
@@ -298,7 +298,6 @@ class BasicModel(pl.LightningModule):
         self.log("train_acc", self.train_acc, on_epoch=True, on_step=False)
         self.log("train_loss", loss, on_epoch=True, on_step=False)
         return loss
-
 
     def test_step(self, batch, batch_idx) -> None:
         x, y = batch
