@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Optional, Type
 
 import numpy as np
 import pytorch_lightning as pl
-import seaborn as sns
+import plotly.express as px
 import torch
 import wandb
 from loguru import logger
@@ -298,10 +298,10 @@ class BasicModel(pl.LightningModule):
         return loss
 
     def on_train_epoch_end(self) -> None:
-        conf_mat_plot = sns.heatmap(
-            self.train_conf_mat.compute().cpu().detach().numpy()
+        fig = px.imshow(
+            self.train_conf_mat.compute().cpu().detach().numpy(), text_auto=True
         )
-        wandb.log({"train_conf_mat": conf_mat_plot})
+        wandb.log({"train_conf_mat": fig})
         self.train_conf_mat.reset()
 
     def test_step(self, batch, batch_idx) -> None:
