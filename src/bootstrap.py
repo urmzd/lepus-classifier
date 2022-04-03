@@ -69,9 +69,13 @@ def bootstrap(
     trainer_factory: TrainerFactory = TrainerFactory(
         logger=WandbLogger(project="rabbit-classifier")
     ),
+    seed_no: Optional[bool] = 42,
 ):
     export_path.mkdir(exist_ok=True, parents=True)
-    seed_everything(42)
+
+    if seed_no:
+        seed_everything(seed_no)
+
     logger.remove()
     logger.add(sys.stderr, level=log_level)
     x_encoder = partial(
