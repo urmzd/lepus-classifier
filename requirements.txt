@@ -37,8 +37,6 @@ h5py==3.6.0
 idna==3.3
 imageio==2.16.1
 importlib-metadata==4.11.3
-ipykernel==6.9.2
-ipython==8.1.1
 isort==5.10.1
 jedi==0.18.1
 joblib==1.1.0
