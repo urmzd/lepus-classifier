@@ -52,10 +52,11 @@ SCALE_HEIGHT = False
 BATCH_SIZE = 2
 NUM_FOLDS = 5
 EXPORT_PATH = Path("model_checkpoints")
+LEARNING_RATE = 0.02
 
 
 def bootstrap(
-    model=BasicModel(),
+    model=BasicModel(learning_rate=LEARNING_RATE),
     log_level=LOG_LEVEL,
     data_manfiest_path=DATA_MANFIEST_PATH,
     image_folder_path=IMAGE_FOLDER_PATH,

@@ -258,7 +258,7 @@ class StratifiedKFoldLoop(Loop):
 
 
 class BasicModel(pl.LightningModule):
-    def __init__(self, n_targets=2) -> None:
+    def __init__(self, n_targets=2, learning_rate=0.02) -> None:
         super().__init__()
         # O: H/2, W/2
         self.layer_1 = torch.nn.Conv2d(1, 15, 2, 2)
@@ -318,4 +318,4 @@ class BasicModel(pl.LightningModule):
         return val_loss
 
     def configure_optimizers(self):
-        return torch.optim.Adam(self.parameters(), lr=0.02)
+        return torch.optim.Adam(self.parameters(), lr=self.learning_rate)
