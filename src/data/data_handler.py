@@ -278,7 +278,6 @@ class BasicModel(pl.LightningModule):
         self.test_conf_mat = ConfusionMatrix(num_classes=n_targets)
 
         self.save_hyperparameters()
-        self.log("hyperparameters", self.hparams)
 
     def forward(self, x):
         x_1 = self.layer_1(x)
@@ -301,19 +300,17 @@ class BasicModel(pl.LightningModule):
         self.log("train_loss", loss, on_epoch=True, on_step=True)
         return loss
 
-    def _log_conf_mat(self, name: str, conf_mat: ConfusionMatrix) -> None:
-        fig = px.imshow(conf_mat.compute().cpu().detach().numpy(), text_auto=True)
-        self.log(name, fig)
-        conf_mat.reset()
+    def validation_step(self, batch, batch_idx) -> torch.Tensor:
+        x, y = batch
+        logits = self.forward(x)
+        val_loss = F.nll_loss(logits, y)
 
-    def on_train_epoch_end(self) -> None:
-        self._log_conf_mat("train_conf_mat", self.train_conf_mat)
+        self.val_acc.update(logits, y)
+        self.val_conf_mat.update(logits, y)
 
-    def on_validation_epoch_end(self) -> None:
-        self._log_conf_mat("val_conf_mat", self.val_conf_mat)
-
-    def on_test_epoch_end(self) -> None:
-        self._log_conf_mat("test_conf_mat", self.test_conf_mat)
+        self.log("val_acc", self.val_acc, on_epoch=True, on_step=True)
+        self.log("val_loss", val_loss, on_epoch=True, on_step=True)
+        return val_loss
 
     def test_step(self, batch, batch_idx) -> None:
         x, y = batch
@@ -326,14 +323,19 @@ class BasicModel(pl.LightningModule):
         self.log("test_acc", self.test_acc, on_epoch=True, on_step=False)
         self.log("test_loss", loss, on_epoch=True, on_step=False)
 
-    def validation_step(self, batch, batch_idx) -> torch.Tensor:
-        x, y = batch
-        logits = self.forward(x)
-        val_loss = F.nll_loss(logits, y)
-        self.val_acc(logits, y)
-        self.log("val_acc", self.val_acc, on_epoch=True, on_step=False)
-        self.log("val_loss", val_loss, on_epoch=True, on_step=False)
-        return val_loss
+    def _log_conf_mat(self, name: str, conf_mat: ConfusionMatrix) -> None:
+        fig = px.imshow(conf_mat.compute().cpu().detach().numpy(), text_auto=True)
+        wandb.log({name: fig})
+        conf_mat.reset()
+
+    def on_train_epoch_end(self) -> None:
+        self._log_conf_mat("train_conf_mat", self.train_conf_mat)
+
+    def on_validation_epoch_end(self) -> None:
+        self._log_conf_mat("val_conf_mat", self.val_conf_mat)
+
+    def on_test_epoch_end(self) -> None:
+        self._log_conf_mat("test_conf_mat", self.test_conf_mat)
 
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=self.learning_rate)
