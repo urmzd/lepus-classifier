@@ -289,11 +289,11 @@ class BasicModel(pl.LightningModule):
 
     def training_step(self, batch, batch_idx) -> torch.Tensor:
         x, y = batch
-        preds = self.forward(x)
-        loss = F.nll_loss(preds, y)
+        logits = self.forward(x)
+        loss = F.nll_loss(logits, y)
 
-        self.train_acc(preds, y)
-        self.train_conf_mat(preds, y)
+        self.train_acc(logits, y)
+        self.train_conf_mat(logits, y)
 
         self.log("train_acc", self.train_acc, on_epoch=True, on_step=False)
         self.log("train_loss", loss, on_epoch=True, on_step=False)
@@ -301,18 +301,18 @@ class BasicModel(pl.LightningModule):
 
     def test_step(self, batch, batch_idx) -> None:
         x, y = batch
-        preds = self.forward(x)
-        loss = F.nll_loss(preds, y)
-        self.test_acc(preds, y)
+        logits = self.forward(x)
+        loss = F.nll_loss(logits, y)
+        self.test_acc(logits, y)
 
         self.log("test_acc", self.test_acc, on_epoch=True, on_step=False)
         self.log("test_loss", loss, on_epoch=True, on_step=False)
 
     def validation_step(self, batch, batch_idx) -> torch.Tensor:
         x, y = batch
-        y_hat = self.forward(x)
-        val_loss = F.nll_loss(y_hat, y)
-        self.val_acc(y_hat, y)
+        logits = self.forward(x)
+        val_loss = F.nll_loss(logits, y)
+        self.val_acc(logits, y)
         self.log("val_acc", self.val_acc, on_epoch=True, on_step=False)
         self.log("val_loss", val_loss, on_epoch=True, on_step=False)
         return val_loss
