@@ -77,7 +77,7 @@ def bootstrap(
 
     logger.remove()
     logger.add(sys.stderr, level=log_level)
-    trainer_factory.set_logger(wandb_logger)
+    trainer_factory.logger = wandb_logger
     x_encoder = partial(
         get_image_encoder(
             desired_height=height, desired_width=width, scale_height=scale_height
