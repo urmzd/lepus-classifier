@@ -13,7 +13,7 @@ from sklearn.model_selection import StratifiedKFold, train_test_split
 import torch
 from torch.nn import functional as F
 from torch.utils.data import Dataset
-from torchmetrics import Accuracy
+from torchmetrics import Accuracy, ConfusionMatrix
 from torchmetrics.functional import accuracy
 
 from typing import Any, Dict, List, Optional, Type
@@ -21,6 +21,7 @@ from abc import ABC, abstractmethod
 from pytorch_lightning.loops.base import Loop
 from pytorch_lightning.loops.fit_loop import FitLoop
 from pytorch_lightning.trainer.states import TrainerFn
+import wandb
 
 from src.data.data_processing import get_target_encoder
 from src.data.data_types import TargetEncoder, FeaturesEncoder
@@ -74,6 +75,7 @@ class LepusStratifiedKFoldDataModule(StratifiedKFoldDataModule):
     batch_size: int = 1
     n_splits: int = 1
     transform_targets: bool = True
+    train_size: float = 0.8
 
     def prepare_data(self) -> None:
         if (
@@ -91,12 +93,14 @@ class LepusStratifiedKFoldDataModule(StratifiedKFoldDataModule):
         else:
             self.target_encoder = None
 
-        train_set, test_set = train_test_split(self.data)
+        # 80 / 20
+        train_set, test_set = train_test_split(self.data, train_size=self.train_size)
         self.train_dataset, self.test_dataset = train_set, test_set
 
         features, targets = train_set[:, 1], train_set[:, 0]
 
         if self.n_splits >= 2:
+            # 80 / 20 * 80 / 20
             splitter = StratifiedKFold(self.n_splits)
             self.splits = [split for split in splitter.split(features, targets)]
         else:
@@ -263,11 +267,14 @@ class BasicModel(pl.LightningModule):
         self.layer_3 = torch.nn.ReLU()
         self.layer_4 = torch.nn.Flatten(1, -1)
         self.layer_5 = torch.nn.Linear(15 * 50 * 50, n_targets)
+        self.softmax_layer = torch.nn.LogSoftmax()
 
         # Logs
         self.train_acc = Accuracy()
         self.val_acc = Accuracy()
         self.test_acc = Accuracy()
+
+        self.train_conf_mat = ConfusionMatrix(num_classes=n_targets)
 
         self.save_hyperparameters()
 
@@ -282,25 +289,30 @@ class BasicModel(pl.LightningModule):
 
     def training_step(self, batch, batch_idx) -> torch.Tensor:
         x, y = batch
-        y_hat = self.forward(x)
-        loss = F.cross_entropy(y_hat, y)
-        self.train_acc(y_hat, y)
+        preds = self.forward(x)
+        loss = F.nll_loss(preds, y)
+
+        self.train_acc(preds, y)
+        self.train_conf_mat(preds, y)
+
         self.log("train_acc", self.train_acc, on_epoch=True, on_step=False)
         self.log("train_loss", loss, on_epoch=True, on_step=False)
         return loss
 
+
     def test_step(self, batch, batch_idx) -> None:
         x, y = batch
-        y_hat = self.forward(x)
-        loss = F.cross_entropy(y_hat, y)
-        self.test_acc(y_hat, y)
+        preds = self.forward(x)
+        loss = F.nll_loss(preds, y)
+        self.test_acc(preds, y)
+
         self.log("test_acc", self.test_acc, on_epoch=True, on_step=False)
         self.log("test_loss", loss, on_epoch=True, on_step=False)
 
     def validation_step(self, batch, batch_idx) -> torch.Tensor:
         x, y = batch
         y_hat = self.forward(x)
-        val_loss = F.cross_entropy(y_hat, y)
+        val_loss = F.nll_loss(y_hat, y)
         self.val_acc(y_hat, y)
         self.log("val_acc", self.val_acc, on_epoch=True, on_step=False)
         self.log("val_loss", val_loss, on_epoch=True, on_step=False)
