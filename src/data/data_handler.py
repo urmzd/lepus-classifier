@@ -170,8 +170,8 @@ class EnsembleVotingModel(pl.LightningModule):
         logits = torch.stack([m(batch[0]) for m in self.models]).mean(0)
         loss = F.cross_entropy(logits, batch[1])
         self.test_acc(logits, batch[1])
-        self.log("test_acc", self.test_acc, on_step=False, on_epoch=True)
-        self.log("test_loss", loss, on_step=False, on_epoch=True)
+        self.log("test_acc", self.test_acc, on_step=True, on_epoch=True)
+        self.log("test_loss", loss, on_step=True, on_epoch=True)
 
 
 class StratifiedKFoldLoop(Loop):
