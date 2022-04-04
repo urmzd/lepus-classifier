@@ -22,7 +22,7 @@ class TrainerFactory:
     strategy: str = "ddp"
     max_epochs: int = 10
     devices: int = 1
-    logger: Optional[WandbLogger] = None
+    internal_logger: Optional[WandbLogger] = None
 
     def get_trainer(self):
         if self.logger:
@@ -35,7 +35,7 @@ class TrainerFactory:
                 devices=self.devices,
                 accelerator="auto",
                 strategy=self.strategy,
-                logger=self.logger,
+                logger=self.internal_logger,
             )
 
             return trainer
@@ -68,16 +68,18 @@ def bootstrap(
     export_path=EXPORT_PATH,
     wandb_logger: WandbLogger = WandbLogger(project="rabbit-classifier"),
     trainer_factory: TrainerFactory = TrainerFactory(),
-    seed_no: Optional[int] = 42
+    seed_no: Optional[int] = 42,
 ):
     export_path.mkdir(exist_ok=True, parents=True)
 
     if seed_no:
         seed_everything(seed_no)
 
+    # System logger.
     logger.remove()
     logger.add(sys.stderr, level=log_level)
-    trainer_factory.logger = wandb_logger
+
+    trainer_factory.internal_logger = wandb_logger
     x_encoder = partial(
         get_image_encoder(
             desired_height=height, desired_width=width, scale_height=scale_height
