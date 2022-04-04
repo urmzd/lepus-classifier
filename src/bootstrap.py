@@ -25,7 +25,7 @@ class TrainerFactory:
     internal_logger: Optional[WandbLogger] = None
 
     def get_trainer(self):
-        if self.logger:
+        if self.internal_logger:
             trainer = Trainer(
                 max_epochs=self.max_epochs,
                 limit_train_batches=None,
