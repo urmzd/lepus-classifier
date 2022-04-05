@@ -21,7 +21,7 @@ Data was retrieved and located in [resources/data.txt](resources/data.txt)
 
 2. Login to your Weights and Biases account using your API key.
 ```bash
-  wanb login
+  wandb login
 ```
 
 3. Use the bootstrap function to start training your custom model. 
