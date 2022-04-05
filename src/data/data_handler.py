@@ -9,7 +9,6 @@ import numpy as np
 import plotly.express as px
 import pytorch_lightning as pl
 import torch
-from isort import place_module
 from loguru import logger
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.loops.base import Loop
