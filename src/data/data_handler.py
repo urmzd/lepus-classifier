@@ -2,7 +2,8 @@ from abc import ABC, abstractmethod
 from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Type, TypedDict
+from typing import Any, Dict, List, Optional, Type
+from typing_extensions import TypedDict
 
 import numpy as np
 import plotly.express as px
@@ -181,6 +182,7 @@ class EnsembleVotingModel(pl.LightningModule):
         self.models = torch.nn.ModuleList(
             [model_cls.load_from_checkpoint(p) for p in checkpoint_paths]
         )
+        self.table = wandb.Table(columns=[""])
 
     def test_step(self, batch: Any, dataloader_idx: int = 0) -> StepOutputDict:
         logits = torch.stack([m(batch[0]) for m in self.models]).mean(0)
