@@ -26,17 +26,20 @@ LEARNING_RATE = 0.02
 N_CLASSES = 2
 SEED_NO: Optional[int] = 42
 
+def get_default_callbacks() -> List[Callback]:
+    return [MetricsCallback(n_targets=N_CLASSES)]
+
 @dataclass
 class TrainerFactory:
-    logger: WandbLogger = WandbLogger(project="rabbit-classifier")
-    callbacks: List[Callback] = field(default_factory=[MetricsCallback(n_targets=N_CLASSES)])
+    trainer_logger: WandbLogger = WandbLogger(project="rabbit-classifier")
+    callbacks: List[Callback] = field(default_factory=get_default_callbacks)
     strategy: str = "ddp"
     max_epochs: int = 10
     devices: Union[List[int], str, None] = "auto"
     deterministic: bool = True
 
     def get_trainer(self):
-        if self.logger is not None:
+        if self.trainer_logger is not None:
             trainer = Trainer(
                 max_epochs=self.max_epochs,
                 limit_train_batches=None,
@@ -46,15 +49,13 @@ class TrainerFactory:
                 devices=self.devices,
                 accelerator="auto",
                 strategy=self.strategy,
-                logger=self.logger,
+                logger=self.trainer_logger,
                 callbacks=self.callbacks,
                 deterministic=self.deterministic,
             )
             return trainer
 
         raise Exception("Must specify logging entity.")
-
-
 
 
 def bootstrap(
@@ -69,11 +70,7 @@ def bootstrap(
     num_folds=NUM_FOLDS,
     export_path=EXPORT_PATH,
     seed_no=SEED_NO,
-    trainer_factory: TrainerFactory = TrainerFactory(
-        logger=WandbLogger(project="rabbit-classifier"),
-        callbacks=[MetricsCallback(n_targets=N_CLASSES)],
-        deterministic=(SEED_NO is not None),
-    ),
+    trainer_factory: TrainerFactory = TrainerFactory(),
 ):
     export_path.mkdir(exist_ok=True, parents=True)
 
