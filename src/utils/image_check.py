@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
+from data_retrieval import download_image, get_data
 from difPy import dif
-from data_retrieval import get_data, download_image
 
 DATA_PATH = "../resources/data.csv"
 IMAGE_PATH = "/tmp/images"

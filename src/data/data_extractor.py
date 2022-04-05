@@ -1,8 +1,10 @@
-from pathlib import Path
-import pandas as pd
 import re
-import requests
+from pathlib import Path
+
 import cv2
+import pandas as pd
+import requests
+
 from src.data.data_types import Image
 
 

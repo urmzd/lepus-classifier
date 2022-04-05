@@ -1,8 +1,8 @@
 from collections import namedtuple
+from typing import Callable, List, NewType, Tuple
+
 import numpy as np
 from pipetools.main import Pipe
-from typing import Callable, NewType, List, Tuple
-
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 
 Image = NewType("Image", np.ndarray)

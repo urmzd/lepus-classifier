@@ -1,14 +1,11 @@
 from functools import partial
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder
-from pipetools import pipe
+
 import cv2
-from src.data.data_types import (
-    FeaturesEncoder,
-    Image,
-    Label,
-    TargetEncoder,
-)
 import numpy as np
+from pipetools import pipe
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+
+from src.data.data_types import FeaturesEncoder, Image, Label, TargetEncoder
 
 
 def get_scaled_dimensions(dim1: int, dim2: int, target_dim: int, reverse=False):
