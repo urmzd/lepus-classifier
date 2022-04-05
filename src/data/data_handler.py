@@ -30,7 +30,6 @@ from torchmetrics import (
     Precision,
     Recall,
 )
-from torchmetrics.functional import accuracy
 
 import wandb
 from src.data.data_extractor import download_image, get_data, get_image
@@ -442,7 +441,8 @@ class MetricsCallback(pl.Callback):
             {
                 "global_step": trainer.global_step,
                 "epoch": self.state["epoch"],
-                "fold": self.state["fold"] ** metrics_dict,
+                "fold": self.state["fold"],
+                ** metrics_dict,
             }
         )
 
