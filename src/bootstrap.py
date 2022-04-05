@@ -1,5 +1,5 @@
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import partial
 from pathlib import Path
 from typing import List, Optional, Union
@@ -13,11 +13,23 @@ from src.data.data_handler import (BasicModel, LepusStratifiedKFoldDataModule,
                                    MetricsCallback, StratifiedKFoldLoop)
 from src.data.data_processing import get_image_encoder
 
+LOG_LEVEL = "INFO"
+DATA_MANFIEST_PATH = Path("./resources/data.csv")
+IMAGE_FOLDER_PATH = Path("/tmp/images")
+HEIGHT = 200
+WIDTH = 200
+SCALE_HEIGHT = False
+BATCH_SIZE = 2
+NUM_FOLDS = 5
+EXPORT_PATH = Path("model_checkpoints")
+LEARNING_RATE = 0.02
+N_CLASSES = 2
+SEED_NO: Optional[int] = 42
 
 @dataclass
 class TrainerFactory:
-    logger: Optional[WandbLogger] = None
-    callbacks: Optional[List[Callback]] = None
+    logger: WandbLogger = WandbLogger(project="rabbit-classifier")
+    callbacks: List[Callback] = field(default_factory=[MetricsCallback(n_targets=N_CLASSES)])
     strategy: str = "ddp"
     max_epochs: int = 10
     devices: Union[List[int], str, None] = "auto"
@@ -43,18 +55,6 @@ class TrainerFactory:
         raise Exception("Must specify logging entity.")
 
 
-LOG_LEVEL = "INFO"
-DATA_MANFIEST_PATH = Path("./resources/data.csv")
-IMAGE_FOLDER_PATH = Path("/tmp/images")
-HEIGHT = 200
-WIDTH = 200
-SCALE_HEIGHT = False
-BATCH_SIZE = 2
-NUM_FOLDS = 5
-EXPORT_PATH = Path("model_checkpoints")
-LEARNING_RATE = 0.02
-N_CLASSES = 2
-SEED_NO: Optional[int] = 42
 
 
 def bootstrap(
