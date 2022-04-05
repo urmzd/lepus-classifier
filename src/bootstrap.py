@@ -31,7 +31,7 @@ def get_default_callbacks() -> List[Callback]:
 
 @dataclass
 class TrainerFactory:
-    trainer_logger: WandbLogger = WandbLogger(project="rabbit-classifier")
+    logger: WandbLogger = WandbLogger(project="rabbit-classifier")
     callbacks: List[Callback] = field(default_factory=get_default_callbacks)
     strategy: str = "ddp"
     max_epochs: int = 10
@@ -39,7 +39,7 @@ class TrainerFactory:
     deterministic: bool = True
 
     def get_trainer(self):
-        if self.trainer_logger is not None:
+        if self.logger is not None:
             trainer = Trainer(
                 max_epochs=self.max_epochs,
                 limit_train_batches=None,
@@ -49,7 +49,7 @@ class TrainerFactory:
                 devices=self.devices,
                 accelerator="auto",
                 strategy=self.strategy,
-                logger=self.trainer_logger,
+                logger=self.logger,
                 callbacks=self.callbacks,
                 deterministic=self.deterministic,
             )
