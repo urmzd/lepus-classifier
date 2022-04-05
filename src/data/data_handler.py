@@ -2,15 +2,16 @@ from abc import ABC, abstractmethod
 from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
-from types import new_class
-from typing import Any, Dict, List, Optional, Type
+from typing import Any, Dict, List, Optional, Type, TypedDict
+from isort import place_module
 
 import numpy as np
-import pytorch_lightning as pl
 import plotly.express as px
+import pytorch_lightning as pl
 import torch
 import wandb
 from loguru import logger
+from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.loops.base import Loop
 from pytorch_lightning.loops.fit_loop import FitLoop
 from pytorch_lightning.trainer.states import TrainerFn
@@ -24,7 +25,14 @@ from src.data.data_processing import get_target_encoder
 from src.data.data_types import FeaturesEncoder, TargetEncoder
 from torch.nn import functional as F
 from torch.utils.data import DataLoader, Dataset
-from torchmetrics import Accuracy, ConfusionMatrix
+from torchmetrics import (
+    Accuracy,
+    ConfusionMatrix,
+    F1Score,
+    MetricCollection,
+    Precision,
+    Recall,
+)
 from torchmetrics.functional import accuracy
 
 
@@ -156,22 +164,28 @@ class LepusStratifiedKFoldDataModule(StratifiedKFoldDataModule):
         super().__init__()
 
 
+class StepOutputDict(TypedDict):
+    loss: torch.Tensor
+    logits: torch.Tensor
+    y_true: torch.Tensor
+
+
 class EnsembleVotingModel(pl.LightningModule):
     def __init__(
-        self, model_cls: Type[pl.LightningModule], checkpoint_paths: List[Path]
+        self,
+        model_cls: Type[pl.LightningModule],
+        checkpoint_paths: List[Path],
     ) -> None:
         super().__init__()
         self.models = torch.nn.ModuleList(
             [model_cls.load_from_checkpoint(p) for p in checkpoint_paths]
         )
-        self.test_acc = Accuracy()
 
-    def test_step(self, batch: Any, dataloader_idx: int = 0) -> None:
+    def test_step(self, batch: Any, dataloader_idx: int = 0) -> StepOutputDict:
         logits = torch.stack([m(batch[0]) for m in self.models]).mean(0)
-        loss = F.cross_entropy(logits, batch[1])
-        self.test_acc(logits, batch[1])
-        self.log("test_acc", self.test_acc, on_step=True, on_epoch=True)
-        self.log("test_loss", loss, on_step=True, on_epoch=True)
+        loss = F.nll_loss(logits, batch[1])
+        output: StepOutputDict = {"loss": loss, "logits": logits, "y_true": batch[1]}
+        return output
 
 
 class StratifiedKFoldLoop(Loop):
@@ -268,15 +282,6 @@ class BasicModel(pl.LightningModule):
         self.layer_5 = torch.nn.Linear(15 * 50 * 50, n_targets)
         self.softmax_layer = torch.nn.LogSoftmax()
 
-        # Logs
-        self.train_acc = Accuracy()
-        self.val_acc = Accuracy()
-        self.test_acc = Accuracy()
-
-        self.train_conf_mat = ConfusionMatrix(num_classes=n_targets)
-        self.val_conf_mat = ConfusionMatrix(num_classes=n_targets)
-        self.test_conf_mat = ConfusionMatrix(num_classes=n_targets)
-
         self.save_hyperparameters()
 
     def forward(self, x):
@@ -288,54 +293,172 @@ class BasicModel(pl.LightningModule):
         result = self.softmax_layer(x_5)
         return result
 
-    def training_step(self, batch, batch_idx) -> torch.Tensor:
+    def _compute_loss(self, batch) -> StepOutputDict:
         x, y = batch
         logits = self.forward(x)
         loss = F.nll_loss(logits, y)
 
-        self.train_acc.update(logits, y)
-        self.train_conf_mat.update(logits, y)
+        output: StepOutputDict = {"loss": loss, "logits": logits, "y_true": y}
 
-        self.log("train_acc", self.train_acc, on_epoch=True, on_step=True)
-        self.log("train_loss", loss, on_epoch=True, on_step=True)
-        return loss
+        return output
 
-    def validation_step(self, batch, batch_idx) -> torch.Tensor:
-        x, y = batch
-        logits = self.forward(x)
-        val_loss = F.nll_loss(logits, y)
+    def training_step(self, batch, batch_idx) -> StepOutputDict:
+        return self._compute_loss(batch)
 
-        self.val_acc.update(logits, y)
-        self.val_conf_mat.update(logits, y)
+    def validation_step(self, batch, batch_idx) -> StepOutputDict:
+        return self._compute_loss(batch)
 
-        self.log("val_acc", self.val_acc, on_epoch=True, on_step=True)
-        self.log("val_loss", val_loss, on_epoch=True, on_step=True)
-        return val_loss
-
-    def test_step(self, batch, batch_idx) -> None:
-        x, y = batch
-        logits = self.forward(x)
-        loss = F.nll_loss(logits, y)
-
-        self.test_acc.update(logits, y)
-        self.test_conf_mat.update(logits, y)
-
-        self.log("test_acc", self.test_acc, on_epoch=True, on_step=True)
-        self.log("test_loss", loss, on_epoch=True, on_step=True)
-
-    def _log_conf_mat(self, name: str, conf_mat: ConfusionMatrix) -> None:
-        fig = px.imshow(conf_mat.compute().cpu().detach().numpy(), text_auto=True)
-        wandb.log({name: fig})
-        conf_mat.reset()
-
-    def on_train_epoch_end(self) -> None:
-        self._log_conf_mat("train_conf_mat", self.train_conf_mat)
-
-    def on_validation_epoch_end(self) -> None:
-        self._log_conf_mat("val_conf_mat", self.val_conf_mat)
-
-    def on_test_epoch_end(self) -> None:
-        self._log_conf_mat("test_conf_mat", self.test_conf_mat)
+    def test_step(self, batch, batch_idx) -> StepOutputDict:
+        return self._compute_loss(batch)
 
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=self.learning_rate)
+
+
+class MetricsState(TypedDict):
+    epochs: int
+    n_batches: int
+
+
+class MetricsCallback(pl.Callback):
+    def __init__(self, n_targets=2):
+        metrics = MetricCollection(
+            Accuracy(),
+            Precision(),
+            F1Score(),
+            Recall(),
+            ConfusionMatrix(num_classes=n_targets),
+        )
+
+        self.train_metrics = metrics.clone(prefix="train_")
+        self.val_metrics = metrics.clone(prefix="val_")
+        self.test_metrics = metrics.clone(prefix="test_")
+
+    def on_train_start(
+        self,
+        trainer: "pl.Trainer",
+        pl_module: "pl.LightningModule",
+    ) -> None:
+        self.train_metrics = self.train_metrics.to(pl_module.device)
+
+    def on_validation_start(
+        self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"
+    ) -> None:
+        self.val_metrics = self.val_metrics.to(pl_module.device)
+
+    def on_test_start(
+        self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"
+    ) -> None:
+        self.test_metrics = self.test_metrics.to(pl_module.device)
+
+    def on_train_batch_end(
+        self,
+        trainer: "pl.Trainer",
+        pl_module: "pl.LightningModule",
+        outputs: StepOutputDict,
+        batch: Any,
+        batch_idx: int,
+        unused: int = 0,
+    ) -> None:
+        self._log_metric_on_batch(self.train_metrics, outputs, trainer, "train")
+
+    def on_validation_batch_end(
+        self,
+        trainer: "pl.Trainer",
+        pl_module: "pl.LightningModule",
+        outputs: StepOutputDict,
+        batch: Any,
+        batch_idx: int,
+        dataloader_idx: int,
+    ) -> None:
+        self._log_metric_on_batch(self.val_metrics, outputs, trainer, "val")
+
+    def on_test_batch_end(
+        self,
+        trainer: "pl.Trainer",
+        pl_module: "pl.LightningModule",
+        outputs: StepOutputDict,
+        batch: Any,
+        batch_idx: int,
+        dataloader_idx: int,
+    ) -> None:
+        self._log_metric_on_batch(self.test_metrics, outputs, trainer, "test")
+
+    def on_train_epoch_end(
+        self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"
+    ) -> None:
+        self._log_metric_on_epoch_end(self.train_metrics, trainer)
+
+    def on_validation_epoch_end(
+        self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"
+    ) -> None:
+        self._log_metric_on_epoch_end(self.val_metrics, trainer)
+
+    def on_test_epoch_end(
+        self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"
+    ) -> None:
+        self._log_metric_on_epoch_end(self.test_metrics, trainer)
+
+    def _log_metric_on_epoch_end(
+        self,
+        metrics: MetricCollection,
+        trainer: pl.Trainer,
+    ):
+
+        metrics_dict = {}
+        confusion_matrix_key = None
+        confusion_matrix = None
+
+        computed_metrics = metrics.compute()
+
+        for key in computed_metrics:
+            if "ConfusionMatrix" in key:
+                confusion_matrix_key = key
+                confusion_matrix = computed_metrics[key]
+            else:
+                metrics_dict[key] = computed_metrics[key]
+
+        metrics.reset()
+        plot = px.imshow(confusion_matrix.cpu().detach().numpy(), text_auto=True)
+        wandb.log({confusion_matrix_key: plot})
+        wandb.log(
+            {
+                "global_step": trainer.global_step,
+                "epoch": trainer.current_epoch,
+                **metrics_dict,
+            }
+        )
+
+    def _log_metric_on_batch(
+        self,
+        metrics: MetricCollection,
+        step_output_dict: StepOutputDict,
+        trainer: pl.Trainer,
+        stage: str
+    ):
+        assert (
+            "loss" in step_output_dict
+            and "y_true" in step_output_dict
+            and "logits" in step_output_dict
+        )
+
+        loss = step_output_dict["loss"]
+        y_true = step_output_dict["y_true"]
+        logits = step_output_dict["logits"]
+
+        metrics.update(logits, y_true)
+
+        metric_dict = {
+            key: metric.compute()
+            for key, metric in metrics.items()
+            if "ConfusionMatrix" not in key
+        }
+
+        wandb.log(
+            {
+                "global_step": trainer.global_step,
+                "epoch": trainer.current_epoch,
+                f"{stage}_loss": loss,
+                **metric_dict,
+            }
+        )

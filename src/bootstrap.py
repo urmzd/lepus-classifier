@@ -1,31 +1,34 @@
+import sys
 from dataclasses import dataclass
 from functools import partial
-import sys
-from pytorch_lightning import seed_everything, Trainer
 from pathlib import Path
-from loguru import logger
+from typing import List, Optional, Union
 
-from src.data.data_processing import get_image_encoder
+import wandb
+from loguru import logger
+from pytorch_lightning import Callback, Trainer, seed_everything
+from pytorch_lightning.loggers import WandbLogger
+
 from src.data.data_handler import (
     BasicModel,
     LepusStratifiedKFoldDataModule,
+    MetricsCallback,
     StratifiedKFoldLoop,
 )
-from typing import Optional
-
-from pytorch_lightning.loggers import WandbLogger
-import wandb
+from src.data.data_processing import get_image_encoder
 
 
 @dataclass
 class TrainerFactory:
+    logger: Optional[WandbLogger] = None
+    callbacks: Optional[List[Callback]] = None
     strategy: str = "ddp"
     max_epochs: int = 10
-    devices: int = 1
-    internal_logger: Optional[WandbLogger] = None
+    devices: Union[List[str], int, None] = "auto"
+    deterministic: bool = True
 
     def get_trainer(self):
-        if self.internal_logger:
+        if self.logger is not None:
             trainer = Trainer(
                 max_epochs=self.max_epochs,
                 limit_train_batches=None,
@@ -35,12 +38,13 @@ class TrainerFactory:
                 devices=self.devices,
                 accelerator="auto",
                 strategy=self.strategy,
-                logger=self.internal_logger,
+                logger=self.logger,
+                callbacks=self.callbacks,
+                deterministic=self.deterministic,
             )
-
             return trainer
-        else:
-            raise Exception("Must specify logging entity.")
+
+        raise Exception("Must specify logging entity.")
 
 
 LOG_LEVEL = "INFO"
@@ -53,6 +57,8 @@ BATCH_SIZE = 2
 NUM_FOLDS = 5
 EXPORT_PATH = Path("model_checkpoints")
 LEARNING_RATE = 0.02
+N_CLASSES = 2
+SEED_NO: Optional[int] = 42
 
 
 def bootstrap(
@@ -66,20 +72,22 @@ def bootstrap(
     batch_size=BATCH_SIZE,
     num_folds=NUM_FOLDS,
     export_path=EXPORT_PATH,
-    wandb_logger: WandbLogger = WandbLogger(project="rabbit-classifier"),
-    trainer_factory: TrainerFactory = TrainerFactory(),
-    seed_no: Optional[int] = 42,
+    seed_no=SEED_NO,
+    trainer_factory: TrainerFactory = TrainerFactory(
+        logger=WandbLogger(project="rabbit-classifier"),
+        callbacks=[MetricsCallback(n_targets=N_CLASSES)],
+        deterministic=(SEED_NO is not None),
+    ),
 ):
     export_path.mkdir(exist_ok=True, parents=True)
 
     if seed_no:
-        seed_everything(seed_no)
+        seed_everything(seed_no, workers=True)
 
     # System logger.
     logger.remove()
     logger.add(sys.stderr, level=log_level)
 
-    trainer_factory.internal_logger = wandb_logger
     x_encoder = partial(
         get_image_encoder(
             desired_height=height, desired_width=width, scale_height=scale_height
