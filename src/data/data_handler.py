@@ -432,7 +432,7 @@ class MetricsCallback(pl.Callback):
             {
                 "global_step": trainer.global_step,
                 "epoch": self.state["epoch"],
-                **metrics_dict,
+                "fold": self.state["epoch"] / trainer.max_epochs**metrics_dict,
             }
         )
 
@@ -467,6 +467,7 @@ class MetricsCallback(pl.Callback):
             {
                 "global_step": trainer.global_step,
                 "epoch": self.state["epoch"],
+                "fold": self.state["epoch"] / trainer.max_epochs,
                 f"{stage}_loss": loss,
                 **metric_dict,
             }
