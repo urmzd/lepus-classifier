@@ -9,8 +9,12 @@ from pytorch_lightning import Callback, Trainer, seed_everything
 from pytorch_lightning.loggers import WandbLogger
 
 import wandb
-from src.data.data_handler import (BasicModel, LepusStratifiedKFoldDataModule,
-                                   MetricsCallback, StratifiedKFoldLoop)
+from src.data.data_handler import (
+    BasicModel,
+    LepusStratifiedKFoldDataModule,
+    MetricsCallback,
+    StratifiedKFoldLoop,
+)
 from src.data.data_processing import get_image_encoder
 
 LOG_LEVEL = "INFO"
@@ -25,10 +29,13 @@ EXPORT_PATH = Path("model_checkpoints")
 LEARNING_RATE = 0.02
 N_CLASSES = 2
 SEED_NO: Optional[int] = 42
-PROJECT_NAME="rabbit-classifier"
+PROJECT_NAME = "rabbit-classifier"
+RUN_NAME = None
+
 
 def get_default_callbacks() -> List[Callback]:
     return [MetricsCallback(n_targets=N_CLASSES)]
+
 
 @dataclass
 class TrainerFactory:
@@ -38,7 +45,8 @@ class TrainerFactory:
     max_epochs: int = 10
     devices: Union[List[int], str, None] = "auto"
     deterministic: bool = True
-    project_name=PROJECT_NAME
+    project_name = PROJECT_NAME
+    run_name: Optional[str] = RUN_NAME
 
     def __post_init__(self) -> None:
         wandb.init(project=PROJECT_NAME)

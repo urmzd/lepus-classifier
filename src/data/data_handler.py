@@ -305,6 +305,7 @@ class BaseModel(pl.LightningModule, ABC):
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=self.learning_rate)
 
+
 class BasicModel(BaseModel):
     def __init__(self, n_targets=2, learning_rate=0.02) -> None:
         super().__init__(n_targets=n_targets, learning_rate=learning_rate)
@@ -326,6 +327,7 @@ class BasicModel(BaseModel):
         x_5 = self.layer_5(x_4)
         result = self.softmax_layer(x_5)
         return result
+
 
 class MetricsState(TypedDict):
     epochs: int
@@ -452,7 +454,7 @@ class MetricsCallback(pl.Callback):
                 "global_step": trainer.global_step,
                 "epoch": self.state["epoch"],
                 "fold": self.state["fold"],
-                ** metrics_dict,
+                **metrics_dict,
             }
         )
 
