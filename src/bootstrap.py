@@ -38,6 +38,7 @@ class TrainerFactory:
     max_epochs: int = 10
     devices: Union[List[int], str, None] = "auto"
     deterministic: bool = True
+    project_name=PROJECT_NAME
 
     def get_trainer(self):
         if self.logger is not None:
@@ -72,9 +73,7 @@ def bootstrap(
     export_path=EXPORT_PATH,
     seed_no=SEED_NO,
     trainer_factory: TrainerFactory = TrainerFactory(),
-    project_name=PROJECT_NAME
 ):
-    wandb.init(project_name=project_name)
     export_path.mkdir(exist_ok=True, parents=True)
 
     if seed_no:
@@ -100,10 +99,13 @@ def bootstrap(
 
     trainer = trainer_factory.get_trainer()
 
+    trainer_factory.logger.watch(model, log="all")
+
     internal_fit_loop = trainer.fit_loop
     trainer.fit_loop = StratifiedKFoldLoop(num_folds, export_path=export_path)
     trainer.fit_loop.connect(internal_fit_loop)
     trainer.fit(model, datamodule)
+
     wandb.finish()
 
 

@@ -275,6 +275,7 @@ class BasicModel(pl.LightningModule):
         super().__init__()
         # Hyper Parameters
         self.learning_rate = learning_rate
+        self.n_targets = n_targets
 
         self.layer_1 = torch.nn.Conv2d(1, 15, 2, 2)
         self.layer_2 = torch.nn.MaxPool2d(2, 2)
