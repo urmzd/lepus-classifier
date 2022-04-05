@@ -25,13 +25,14 @@ EXPORT_PATH = Path("model_checkpoints")
 LEARNING_RATE = 0.02
 N_CLASSES = 2
 SEED_NO: Optional[int] = 42
+PROJECT_NAME="rabbit-classifier"
 
 def get_default_callbacks() -> List[Callback]:
     return [MetricsCallback(n_targets=N_CLASSES)]
 
 @dataclass
 class TrainerFactory:
-    logger: WandbLogger = WandbLogger(project="rabbit-classifier")
+    logger: WandbLogger = WandbLogger(project=PROJECT_NAME)
     callbacks: List[Callback] = field(default_factory=get_default_callbacks)
     strategy: str = "ddp"
     max_epochs: int = 10
@@ -71,7 +72,9 @@ def bootstrap(
     export_path=EXPORT_PATH,
     seed_no=SEED_NO,
     trainer_factory: TrainerFactory = TrainerFactory(),
+    project_name=PROJECT_NAME
 ):
+    wandb.init(project_name=project_name)
     export_path.mkdir(exist_ok=True, parents=True)
 
     if seed_no:
