@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from dataclasses import dataclass
-from math import floor
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Type, TypedDict
 
@@ -15,12 +14,21 @@ from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.loops.base import Loop
 from pytorch_lightning.loops.fit_loop import FitLoop
 from pytorch_lightning.trainer.states import TrainerFn
-from sklearn.model_selection import (StratifiedKFold, StratifiedShuffleSplit,
-                                     train_test_split)
+from sklearn.model_selection import (
+    StratifiedKFold,
+    StratifiedShuffleSplit,
+    train_test_split,
+)
 from torch.nn import functional as F
 from torch.utils.data import DataLoader, Dataset
-from torchmetrics import (Accuracy, ConfusionMatrix, F1Score, MetricCollection,
-                          Precision, Recall)
+from torchmetrics import (
+    Accuracy,
+    ConfusionMatrix,
+    F1Score,
+    MetricCollection,
+    Precision,
+    Recall,
+)
 from torchmetrics.functional import accuracy
 
 import wandb
