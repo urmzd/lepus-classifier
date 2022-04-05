@@ -321,6 +321,11 @@ class MetricsState(TypedDict):
     n_batches: int
 
 
+class MetricState(TypedDict):
+    fold: int
+    epoch: int
+
+
 class MetricsCallback(pl.Callback):
     def __init__(self, n_targets=2):
         metrics = MetricCollection(
@@ -334,12 +339,12 @@ class MetricsCallback(pl.Callback):
         self.train_metrics = metrics.clone(prefix="train_")
         self.val_metrics = metrics.clone(prefix="val_")
         self.test_metrics = metrics.clone(prefix="test_")
-        self.state = {"epoch": 0}
+        self.state: MetricState = {"fold": 0, "epoch": 0}
 
-    def load_state_dict(self, state_dict: Dict[str, Any]) -> None:
+    def load_state_dict(self, state_dict: MetricState) -> None:
         self.state.update(state_dict)
 
-    def state_dict(self) -> Dict[str, Any]:
+    def state_dict(self) -> MetricState:
         return self.state.copy()
 
     def on_train_start(
@@ -414,6 +419,8 @@ class MetricsCallback(pl.Callback):
         trainer: pl.Trainer,
     ):
 
+        self.state["epoch"] += 1
+
         metrics_dict = {}
         confusion_matrix_key = None
         confusion_matrix = None
@@ -433,8 +440,7 @@ class MetricsCallback(pl.Callback):
             {
                 "global_step": trainer.global_step,
                 "epoch": self.state["epoch"],
-                "fold": floor(self.state["epoch"] / trainer.max_epochs),
-                **metrics_dict,
+                "fold": self.state["fold"] ** metrics_dict,
             }
         )
 
@@ -469,7 +475,7 @@ class MetricsCallback(pl.Callback):
             {
                 "global_step": trainer.global_step,
                 "epoch": self.state["epoch"],
-                "fold": floor(self.state["epoch"] / trainer.max_epochs),
+                "fold": self.state["fold"],
                 f"{stage}_loss": loss,
                 **metric_dict,
             }
