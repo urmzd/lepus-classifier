@@ -20,7 +20,7 @@ class TrainerFactory:
     callbacks: Optional[List[Callback]] = None
     strategy: str = "ddp"
     max_epochs: int = 10
-    devices: Union[List[str], int, None] = "auto"
+    devices: Union[List[int], str, None] = "auto"
     deterministic: bool = True
 
     def get_trainer(self):
