@@ -431,7 +431,8 @@ class MetricsCallback(pl.Callback):
         wandb.log(
             {
                 "global_step": trainer.global_step,
-                "epoch": self.state["epoch"] ** metrics_dict,
+                "epoch": self.state["epoch"],
+                **metrics_dict,
             }
         )
 
