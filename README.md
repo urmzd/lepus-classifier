@@ -33,4 +33,4 @@ bootstrap()
 
 ### Google Collab
 
-Take a look at [notebooks/example-bootstrap](notebooks/example-bootstrap.ipynb)
+Take a look at [notebooks/example-bootstrap](notebooks/example_bootstrap.ipynb)
