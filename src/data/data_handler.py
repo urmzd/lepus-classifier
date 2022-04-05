@@ -323,16 +323,23 @@ class MetricsState(TypedDict):
 class MetricsCallback(pl.Callback):
     def __init__(self, n_targets=2):
         metrics = MetricCollection(
-            Accuracy(),
-            Precision(),
-            F1Score(),
-            Recall(),
+            Accuracy(num_classes=n_targets),
+            Precision(num_classes=n_targets),
+            F1Score(num_classes=n_targets),
+            Recall(num_classes=n_targets),
             ConfusionMatrix(num_classes=n_targets),
         )
 
         self.train_metrics = metrics.clone(prefix="train_")
         self.val_metrics = metrics.clone(prefix="val_")
         self.test_metrics = metrics.clone(prefix="test_")
+        self.state = {"epoch": 0}
+
+    def load_state_dict(self, state_dict: Dict[str, Any]) -> None:
+        self.state.update(state_dict)
+
+    def state_dict(self) -> Dict[str, Any]:
+        return self.state.copy()
 
     def on_train_start(
         self,
@@ -340,6 +347,7 @@ class MetricsCallback(pl.Callback):
         pl_module: "pl.LightningModule",
     ) -> None:
         self.train_metrics = self.train_metrics.to(pl_module.device)
+        self.state["epoch"] += 1
 
     def on_validation_start(
         self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"
@@ -418,23 +426,23 @@ class MetricsCallback(pl.Callback):
             else:
                 metrics_dict[key] = computed_metrics[key]
 
-        metrics.reset()
         plot = px.imshow(confusion_matrix.cpu().detach().numpy(), text_auto=True)
         wandb.log({confusion_matrix_key: plot})
         wandb.log(
             {
                 "global_step": trainer.global_step,
-                "epoch": trainer.current_epoch,
-                **metrics_dict,
+                "epoch": self.state["epoch"] ** metrics_dict,
             }
         )
+
+        metrics.reset()
 
     def _log_metric_on_batch(
         self,
         metrics: MetricCollection,
         step_output_dict: StepOutputDict,
         trainer: pl.Trainer,
-        stage: str
+        stage: str,
     ):
         assert (
             "loss" in step_output_dict
@@ -457,7 +465,7 @@ class MetricsCallback(pl.Callback):
         wandb.log(
             {
                 "global_step": trainer.global_step,
-                "epoch": trainer.current_epoch,
+                "epoch": self.state["epoch"],
                 f"{stage}_loss": loss,
                 **metric_dict,
             }
