@@ -48,9 +48,6 @@ class TrainerFactory:
     project_name = PROJECT_NAME
     run_name: Optional[str] = RUN_NAME
 
-    def __post_init__(self) -> None:
-        wandb.init(project=PROJECT_NAME)
-
     def get_trainer(self):
         if self.logger is not None:
             trainer = Trainer(
