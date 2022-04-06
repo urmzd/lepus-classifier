@@ -118,7 +118,3 @@ def bootstrap(
     trainer.fit(model, datamodule)
 
     wandb.finish()
-
-
-if __name__ == "__main__":
-    bootstrap()
