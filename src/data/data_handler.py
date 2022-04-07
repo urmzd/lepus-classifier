@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, ForwardRef, List, Optional, Type
+from typing import Any, Dict, List, Optional, Type
 from typing_extensions import TypedDict
 
 import numpy as np
@@ -10,7 +10,6 @@ import plotly.express as px
 import pytorch_lightning as pl
 import torch
 from loguru import logger
-from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.loops.base import Loop
 from pytorch_lightning.loops.fit_loop import FitLoop
 from pytorch_lightning.trainer.states import TrainerFn

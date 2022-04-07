@@ -39,7 +39,7 @@ def get_default_callbacks() -> List[Callback]:
 
 @dataclass
 class TrainerFactory:
-    logger: WandbLogger = WandbLogger(project=PROJECT_NAME)
+    logger: WandbLogger = WandbLogger(project=PROJECT_NAME, log_model="all")
     callbacks: List[Callback] = field(default_factory=get_default_callbacks)
     strategy: str = "ddp"
     max_epochs: int = 10
@@ -49,23 +49,20 @@ class TrainerFactory:
     run_name: Optional[str] = RUN_NAME
 
     def get_trainer(self):
-        if self.logger is not None:
-            trainer = Trainer(
-                max_epochs=self.max_epochs,
-                limit_train_batches=None,
-                limit_val_batches=None,
-                limit_test_batches=None,
-                num_sanity_val_steps=0,
-                devices=self.devices,
-                accelerator="auto",
-                strategy=self.strategy,
-                logger=self.logger,
-                callbacks=self.callbacks,
-                deterministic=self.deterministic,
-            )
-            return trainer
-
-        raise Exception("Must specify logging entity.")
+        trainer = Trainer(
+            max_epochs=self.max_epochs,
+            limit_train_batches=None,
+            limit_val_batches=None,
+            limit_test_batches=None,
+            num_sanity_val_steps=0,
+            devices=self.devices,
+            accelerator="auto",
+            strategy=self.strategy,
+            logger=self.logger,
+            callbacks=self.callbacks,
+            deterministic=self.deterministic,
+        )
+        return trainer
 
 
 def bootstrap(
@@ -107,14 +104,12 @@ def bootstrap(
 
     trainer = trainer_factory.get_trainer()
 
-    trainer_factory.logger.watch(model, log="all")
-
     internal_fit_loop = trainer.fit_loop
     trainer.fit_loop = StratifiedKFoldLoop(num_folds, export_path=export_path)
     trainer.fit_loop.connect(internal_fit_loop)
     trainer.fit(model, datamodule)
 
-    wandb.finish()
+    trainer.logger.finalize("success")
 
 
 if __name__ == "__main__":
