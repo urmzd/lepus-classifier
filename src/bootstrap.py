@@ -48,7 +48,7 @@ class TrainerFactory:
     project_name = PROJECT_NAME
     run_name: Optional[str] = RUN_NAME
 
-    def get_trainer(self):
+    def get_trainer(self, **kwargs):
         trainer = Trainer(
             max_epochs=self.max_epochs,
             limit_train_batches=None,
@@ -61,6 +61,7 @@ class TrainerFactory:
             logger=self.logger,
             callbacks=self.callbacks,
             deterministic=self.deterministic,
+            **kwargs
         )
         return trainer
 
