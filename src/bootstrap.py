@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import sys
 from dataclasses import dataclass, field
 from functools import partial
@@ -81,6 +83,7 @@ def bootstrap(
     trainer_factory: TrainerFactory = TrainerFactory(),
 ):
     export_path.mkdir(exist_ok=True, parents=True)
+    image_folder_path.mkdir(exists_ok=True, parents=True)
 
     if seed_no:
         seed_everything(seed_no, workers=True)
@@ -112,3 +115,6 @@ def bootstrap(
 
     trainer.logger.finalize("success")
 
+
+if __name__ == "__main__":
+    bootstrap()

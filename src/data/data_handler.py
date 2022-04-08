@@ -30,7 +30,13 @@ from torchmetrics import (
 )
 
 import wandb
-from src.data.data_extractor import download_image_from_link, extract_path_from_link, get_image, get_data, get_image
+from src.data.data_extractor import (
+    download_image_from_link,
+    extract_path_from_link,
+    get_image,
+    get_data,
+    get_image,
+)
 from src.data.data_processing import get_target_encoder
 from src.data.data_types import FeaturesEncoder, TargetEncoder
 
@@ -156,7 +162,7 @@ class LepusStratifiedKFoldDataModule(StratifiedKFoldDataModule):
             self.batch_size,
         )
 
-    def __post_init__(cls):
+    def __post_init__(self):
         super().__init__()
 
 
