@@ -70,8 +70,22 @@ In the scope of this project, we consider the supervised learning problem of ima
 
 \section{Theoretical Background}
 \subsection{Neural Networks}
+Artificial Neural Networks (ANN) are a type of computation model designed to replicate the function of a human brain, effectively mimicking the nervous system pathways in sending and processing signals through singular processing units called neurons (CITE Gurney). An artificial neuron’s activation can be mathematically modelled as a weighted vector sum of inputs, passed into a unit-specific, non-linear activation function, as shown in Figure 2.1 below. The unit’s activation, a, is computed by the result of the non-linear activation function $\phi$.
+
+Figure 2.1 (CITE L03 GROSSEY)
+
+To build an ANN, we organize a corresponding sequence of artificial neurons. They operate in parallel to map an input X to a linear or non-linear function output (CITE Jen et al., DIVA). The neurons are organized into a series of interconnected layers to produce a function mapping with input X to an output Y. The first layer is an input layer, followed by a series of hidden layers that receive input from the previous layer before passing the transformations to an output layer to produce the final output Y, as shown in Figure 2.2 below. Mathematically, a simple neural network with two hidden layers can be represented by the equations shown in Figure 2.3 below, where h is a layer, and y is the output of the final activation function with respect to the previous layer. In this case, the hidden layers are called fully-connected or dense layers since the neuron units are directly connected to the previous layer’s neurons (CITE L03 GROSSEY).
+ 
+Figure 2.3 (CITE L03 GROSSEY)
+Figure 2.2 (JENA ET AL FIGURE 1)
+\url{https://www.inf.ed.ac.uk/teaching/courses/nlu/assets/reading/Gurney_et_al.pdf }
 
 \subsection{Convolutional Neural Networks}
+CNNs are a commonly employed deep learning architecture, particularly in computer vision applications, that use the mathematical convolution operations in its layers (L09 GROSSE). Traditional CNN architectures comprise an input layer and one or more convolution and pooling layers followed by dense layers through to the output layer (STANFORD CHEAT). 
+Convolution layers apply mathematical convolution operations paired with a non-linear activation function to facilitate feature detection from an input signal (L09 GROSSE). The layer hyperparameters include filter size (or kernel) and stride length (STANFORD CHEAT). The resulting layer output is a feature map.  The activations for convolutional layers are computed where the feature maps, z, are the sum of input x convoluted by an input-output specific filter w, with an elementwise activation function, $\phi$, applied as in Figure 2.4 below. In contrast to dense layers, convolution layers are sparsely connected and employ weight sharing, which effectively reduces the number of necessary weights and connections for better computation efficiency (L09 GROSSe). 
+ 
+Figure 2.4 (L09 GROSSE)
+Pooling layers are applied following the convolution layers to downsample the outputted feature maps, generally taking the maximum or average over a particular region of an input mapping (STANFPRD, L09). By taking the maximum value, the pooling layer can reduce the number of parameters and computational requirements without sacrificing the integrity of the detected features. Specifically, using the stride length S as a hyperparameter, pooling layers reduce each dimension of the input representation by a factor S (L09). Pooling layers provide network architectures with the invariance properties with respect to input transformations, meaning that shifting network inputs slightly will not cause significant variations in classification decisions (L09). 
 
 \subsection{Activation Functions}
 Activation functions are critical to generating the output of neurons, effectively defining the mathematical characteristics of the neural network (CITE Activation Paper). Specifically, the activation function’s derivatives and gradients are essential to training a neural network, particularly when computing hyperparameter optimizations. Common activation functions include logistic sigmoid, Tanh, ReLU, and SoftMax. 
@@ -158,7 +172,7 @@ Finally, the normalized images are padded and cropped to ensure uniformity befor
 
 
 \section{Experiments and Analysis}
-We build a classification system based on a CNN model called the Lepus Classifier, which differentiates between images eastern cottontail rabbits and European hares for a binary classification task. We explore the design and training process of an image classification neural network, looking to neural network architecture changes and hyperparameter tuning for the core of our experiments. Additionally, we experiment with training algorithms and optimizations. The sections below explore training the CNN using Stratified K-Fold Splitting and various optimization algorithms. We explore modifying convolutional layers in terms of the convolutions, depth, width, and pooling, and consider the implications of dropout and regularization. Additionally, we consider the performance impact of different activation functions.  FULL EXPERIMENTAL RESULTS ARE IN APPENDIX A
+We build a classification system based on a CNN model called the Lepus Classifier, which differentiates between images of eastern cottontail rabbits and European hares for a binary classification task. We explore the design and training process of an image classification neural network, looking to neural network architecture changes and hyperparameter tuning for the core of our experiments. Additionally, we experiment with training algorithms and optimizations. The sections below explore training the CNN using Stratified K-Fold Splitting and various optimization algorithms. We explore modifying convolutional layers in terms of the convolutions, depth, width, and pooling, and consider the implications of dropout and regularization. Additionally, we consider the performance impact of different activation functions.  FULL EXPERIMENTAL RESULTS ARE IN APPENDIX A
 
 \subsection{Stratified K-Fold Split}
 \subsection{Batch Size}
@@ -174,7 +188,12 @@ We observed that the best performance came from using a batch size of 2, yieldin
 \subsection{Convolutions}
 \subsection{Width}
 \subsection{Depth}
-\subsection{Activation}
+\subsection{Hidden-Layer Activations}
+In our experiments, we modify the activation functions of the hidden layers in our baseline CNN architecture to observe their impact on training and hyperparameter fine-tuning. We employ ReLU, Tanh, and logistic sigmoid activation functions for this task since they are among the most used. We note that ReLU was selected as our default activation function for our baseline architecture due to the simplicity of its computational requirements.
+
+Using ReLU activations, the model achieved training, testing, and validation accuracies of 1.0, 0.53, and 0.92, respectively. We note a large discrepancy between the testing and validation scores. However, the model can minimize the loss function effectively enough. It is possible that the simplicity of the ReLU activation’s gradients may be causing a challenge in training a complex, feature-driven network to handle the Lepus data. With the Tanh activation, the network achieves a far better-balanced performance than previous iterations, with training, testing, and validation accuracies of 1.0, 0.65, and 0.62, respectively. We note that the loss functions across all three sets are significantly minimized with Tanh activations than ReLU and logistic sigmoid. Finally, with logistic sigmoid, accuracies of 0.64, 0.47, and 0.62 across the train, test, and validation sets, the poorest performance in this set of experiments by a large margin. This behaviour is not unexpected based on the mathematical characteristics of this function, as discussed in section 2.3. Based on the performance in these experiments, Tanh activation trains a more consistent, well-rounded network that can capture the complexity of the Lepus data more effectively.
+
+
 \subsection{Regularization}
 
 \
