@@ -1,3 +1,4 @@
+from functools import lru_cache
 import re
 from pathlib import Path
 
@@ -15,9 +16,9 @@ def get_data(data_path: Path) -> pd.DataFrame:
 
     raise Exception("This should never happen.")
 
-
-def download_image(link: str, image_folder_path: Path) -> Path:
-    """Downloads the image from the specified link to the given folder path.
+@lru_cache()
+def extract_path_from_link(link: str, image_folder_path: Path) -> Path:
+    """Extract the image path from the specified link.
 
     View  : https://regex101.com/r/3bhDMM/1
     Delete: https://regex101.com/delete/N5sItwbrPF73ZllTnRDltxZ1
@@ -35,9 +36,12 @@ def download_image(link: str, image_folder_path: Path) -> Path:
     else:
         file_name = regex_matches.group(1)
 
-    image_folder_path.mkdir(parents=True, exist_ok=True)
-
     file_path = image_folder_path / file_name
+
+    return file_path
+
+def download_image_from_link(link: str, image_folder_path: Path) -> Path:
+    file_path = extract_path_from_link(link, image_folder_path)
 
     if file_path.exists():
         return file_path
@@ -52,7 +56,6 @@ def download_image(link: str, image_folder_path: Path) -> Path:
         handle.write(image.content)
 
     return file_path
-
 
 def get_image(file_path: Path) -> Image:
     image = cv2.imread(str(file_path))
