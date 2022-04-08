@@ -1,0 +1,233 @@
+\documentclass{article}
+
+% if you need to pass options to natbib, use, e.g.:
+%     \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2021
+
+% ready for submission
+%\usepackage{neurips_2021}
+
+% to compile a preprint version, e.g., for submission to arXiv, add add the
+% [preprint] option:
+\PassOptionsToPackage{numbers}{natbib}
+\usepackage[preprint]{neurips_2021}
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+%\usepackage[final]{neurips_2021}
+
+% to avoid loading the natbib package, add option nonatbib:
+%    \usepackage[nonatbib]{neurips_2021}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{xcolor}         % colors
+
+\title{The Lepus Classifier: Exploring Image Classification with Convolutional Neural Networks}
+
+% ADD REFERENCING AS WELL IN IEEE
+\author{%
+  Urmzd
+  Mukhammadnaim$^1$\\
+  \texttt{B00800045}\\
+  Faculty of Computer Science\\
+  Dalhousie University\\
+  Halifax, NS  \\
+  \texttt{urmzd@dal.ca} \\
+  \And
+  Keelin M.A.
+  Sekerka-Bajbus$^1$\\
+  \texttt{B00739421}\\
+  Faculty of Computer Science\\
+  Dalhousie University\\
+  Halifax, NS  \\
+  \texttt{kl967038@dal.ca} \\
+  \AND
+  Benjamin J. Macdonald$^1$ \\
+  \texttt{B00803015}\\
+  Faculty of Computer Science\\
+  Dalhousie University\\
+  Halifax, NS  \\
+  \texttt{bn282348@dal.ca} \\
+}
+
+\begin{document}
+
+\maketitle
+\begin{abstract}
+  The abstract paragraph will be HERE.
+\end{abstract}
+
+\section{Introduction}
+
+With the growth of machine learning in recent years, image classification as a core problem in the field of computer vision has become increasingly sophisticated in complex applications. The task of image classification, or object recognition, relies heavily on feature extraction to identify an appropriate object category label \cite{SHARMA2018377,8078730}. Image feature extraction looks to image pixel values to identify differences between samples and across object categories \cite{SHARMA2018377}. With improved performance in this task through deep learning techniques, especially Convolutional Neural Networks (CNN), feature extraction and image pattern recognition have become more efficient and accurate, yielding models with a more robust ability to understand images \cite{SHARMA2018377,8078730}.
+
+In the scope of this project, we consider the supervised learning problem of image classification using neural networks to differentiate between Eastern cottontail rabbits and European hares. We design and train CNN architectures using a dataset of images collected via internet scraping in our approach to this binary classification problem. Furthermore, we conduct experiments to explore the design process of training a CNN using foundational image processing techniques, different model layer and activation functions, and model hyper-parameter tuning to understand better how neural networks behave in this task.
+
+\section{Theoretical Background}
+\subsection{Neural Networks}
+Artificial Neural Networks (ANN) are a type of computation model designed to replicate the function of a human brain, effectively mimicking the nervous system pathways in sending and processing signals through singular processing units called \emph{neurons} \cite{gurney1997introduction}. An artificial neuron’s activation can be mathematically modelled as a weighted vector sum of inputs, passed into a unit-specific, non-linear activation function, as shown in Figure 2.1 below. The unit’s activation, \emph{a}, is computed by the result of the non-linear activation function $\phi$.
+
+Figure 2.1 (CITE L03 GROSSEY)
+
+To build an ANN, we organize a corresponding sequence of artificial neurons. They operate in parallel to map an input \emph{X} to a linear or non-linear function output \cite{https://doi.org/10.1002/cpe.6767,seger2018investigation}. The neurons are organized into a series of interconnected layers to produce a function mapping with input \emph{X} to an output \emph{Y}. The first layer is an input layer, followed by a series of hidden layers that receive input from the previous layer before passing the transformations to an output layer to produce the final output \emph{Y}, as shown in Figure 2.2 below. Mathematically, a simple neural network with two hidden layers can be represented by the equations shown in Figure 2.3 below, where \emph{h} is a layer, and \emph{y} is the output of the final activation function with respect to the previous layer. In this case, the hidden layers are called fully-connected or dense layers since the neuron units are directly connected to the previous layer’s neurons \cite{grosse2019lecture03}.
+ 
+Figure 2.3 (CITE L03 GROSSEY)
+Figure 2.2 (JENA ET AL FIGURE 1)
+
+
+
+\subsection{Convolutional Neural Networks}
+CNNs are a commonly employed deep learning architecture, particularly in computer vision applications, that use the mathematical convolution operations in its layers \cite{grosse2019lecture09}. Traditional CNN architectures comprise an input layer and one or more convolution and pooling layers followed by dense layers through to the output layer \cite{amidi_amidi}. 
+Convolution layers apply mathematical convolution operations paired with a non-linear activation function to facilitate feature detection from an input signal \cite{grosse2019lecture09}. The layer hyperparameters include filter size (or kernel) and stride length \cite{amidi_amidi}. The resulting layer output is a feature map.  The activations for convolutional layers are computed where the feature maps, \emph{z}, are the sum of input \emph{x} convoluted by an input-output specific filter \emph{w}, with an element-wise activation function, $\phi$, applied as in Figure 2.4 below. In contrast to dense layers, convolution layers are sparsely connected and employ weight sharing, which effectively reduces the number of necessary weights and connections for better computation efficiency \cite{grosse2019lecture09}. 
+ 
+Figure 2.4 (L09 GROSSE)
+Pooling layers are applied following the convolution layers to downsample the outputted feature maps, generally taking the maximum or average over a particular region of an input mapping \cite{grosse2019lecture09,amidi_amidi}. By taking the maximum value, the pooling layer can reduce the number of parameters and computational requirements without sacrificing the integrity of the detected features. Specifically, using the stride length \emph{S} as a hyperparameter, pooling layers reduce each dimension of the input representation by a factor \emph{S} \cite{grosse2019lecture09}. Pooling layers provide network architectures with the invariance properties with respect to input transformations, meaning that shifting network inputs slightly will not cause significant variations in classification decisions \cite{grosse2019lecture09}. 
+
+\subsection{Activation Functions}
+Activation functions are critical to generating the output of neurons, effectively defining the mathematical characteristics of the neural network \cite{lederer2021activation}. Specifically, the activation function’s derivatives and gradients are essential to training a neural network, particularly when computing hyperparameter optimizations. Common activation functions include logistic sigmoid, Tanh, ReLU, and SoftMax. 
+
+Sigmoid functions are smooth curves with one inflection point bound to a defined interval. Logistic sigmoid activation functions are commonly employed in neural networks, mainly since it provides a smooth approximation of a binary function, also called a step-function \cite{lederer2021activation}. 
+
+INSERT EQUATION \& GRAPH
+
+For hidden layers, logistic sigmoid functions can be detrimental to a network’s training because of the saturation of values across the domain. In particular, the function lacks sensitivity when the input is very large or very negative, making gradient-based learning computationally challenging for networks \cite{Goodfellow-et-al-2016}. It is only sensitive at the mid-point. Additionally, the function is known to struggle with the vanishing gradient problem during network backpropagation, leading to further challenges for multi-layer networks in training as layers are unable to update their parameters effectively. For this reason, logistic sigmoid functions are not generally used for hidden layer activations. Instead, they are employed more frequently for output units since applying a loss function at the final layer can effectively mitigate the impact of the inherent saturation issue \cite{Goodfellow-et-al-2016}. 
+
+INSERT EQUATION AND GRAPH
+
+The hyperbolic tangent function, Tanh, is another type of sigmoid function with similar properties to the logistic sigmoid function. In essence, the Tanh function is “a shifted and scaled version” of the logistic sigmoid function \cite{lederer2021activation}. However, Tanh functions generally perform better than the logistic function in training neural networks, and, as such, are the preferred sigmoid activation function \cite{Goodfellow-et-al-2016}.  
+
+INSERT EQUATION AND GRAPH
+
+The ReLU (Rectified Linear Unit) function is frequently used because of the simplicity of its implementation and gradients allow for easy optimization and reduced computation requirements \cite{lederer2021activation,Goodfellow-et-al-2016}. It is highly similar to a linear unit, however, the rectification zeros the output for half the domain, keeping gradients consistently large upon activation \cite{Goodfellow-et-al-2016}. This activation has its own form of a vanishing-gradient problem where many units may be inactive during training, which is especially detrimental when dealing with high complexity models \cite{lederer2021activation}. 
+
+INSERT EQUATION AND GRAPH
+
+The SoftMax regression function is used in multi-class classification tasks for output layer units, calculating the likelihood of each target class over all classes.  It is based on the logistic sigmoid function, which maps the class probabilities to a binary output, but modified to suit multiple classes (CITE STANFORD).
+
+INSERT EQUATION AND GRAPH
+
+We note that for output layers, it is common to use Sigmoid or SoftMax activation functions to define the final output for classification problems. SoftMax is commonly employed in multi-class classification, while Sigmoid is well suited to multi-label classification problems where outputs are not mutually exclusive (GLBMED).
+
+\url{https://glassboxmedicine.com/2019/05/26/classification-sigmoid-vs-softmax/}
+\url{http://deeplearning.stanford.edu/tutorial/supervised/SoftmaxRegression/}
+
+\subsection{Loss Functions}
+Cost functions are essential to gradient-based learning in neural networks, specifically by providing a measure to minimize during training for optimization processes. The cost function provides a metric to quantify the difference between predicted or estimated values and actual values. In gradient-based learning, the cost function is iteratively optimized by approximating its gradients where it may not be feasible computationally otherwise (CITE DLB). Among the most common cost functions is the negative log-likelihood loss, which is particularly useful in classification problems (CITE PYTORCH). The maximum likelihood estimation will be yielded upon minimizing negative log-likelihood loss. The trained neural network will select the highest probability target class as a prediction as a result (CITE DLB).
+	
+	INSERT EQUATION
+
+\url{https://pytorch.org/docs/stable/generated/torch.nn.NLLLoss.html }
+
+\subsection{Optimization Algorithms}
+Optimizers are used to minimize loss functions during neural network training processes, effectively improving model performance through internal parameter updates (CITE ieee paper). Specifically, parameter updates are performed once backpropagation is completed such that the gradient is fully completed. Among the most common optimizers are Stochastic Gradient Descent (SGD), AdaGrad, RMSProp, and Adam.  
+
+SGD is a well-known optimization algorithm where the parameter update occurs by following the negative gradient direction such that the loss function is being minimized (CITE IEEE and STANFORD). The gradient effectively describes the direction to follow such that the minima of the loss function will be approached quickly. The update process utilizes the learning rate multiplied by the gradient to iteratively adjust parameters until convergence (CITE IEEE), as shown in the formula below.
+	INSERT EQUATION
+
+AdaGrad is an algorithm that provides adaptive learning rates for training neural networks. It reduces the advancement towards the loss function minima over time by computing the parameter-wise sum of squared gradients to normalize the update step (CITE STAN, IEEE). As a result, the learning rates are adjusted based on how large a parameter’s gradient is, meaning that parameters with larger gradients will have the learning rate reduced or increased in the case of smaller ones (CITE STAN). 
+	INSERT EQUATION
+
+RMSProp, which stands for Root Mean Square Propagation, relies on an exponentially weighted average of gradients, instead of the gradients computed each training epoch, to compute the parameter updates. It is, in essence, a less aggressive form of the AdaGrad optimizer (CITE STAN, IEEE). The formula below describes the parameter update
+		INSERT EQUATION
+
+The Adam optimizer is often recommended as a default algorithm due to its robust experimental performance (CITE STANFORD), as it provides an efficient stochastic gradient descent using adaptive estimation derived from the first and second order gradient moments (CITE IEEE). It is essentially a mixture of the RMSProp and AdaGrad methods described in detail above, with a better ability to generalize performance (CITE Stanford,Cornell). The core difference being that Adam uses the average of the second order gradient moments to compute the parameter updates, while RMSProp uses first order (CITE Cornell).
+		INSERT EQUATION
+
+
+
+-	https://cs231n.github.io/neural-networks-3/ 
+-	https://ieeexplore-ieee-org.ezproxy.library.dal.ca/document/8862686
+-	https://optimization.cbe.cornell.edu/index.php?title=Adam 
+
+
+\section{Data Collection and Pre-Processing}
+To build our dataset, we collected 87 images, 47 of which were Eastern cottontail rabbits and 39 European hares, respectively. The images are labelled under one of two categories, rabbit or hare, with respect to the appropriate species to frame the binary classification task. Evidently, the class distribution is slightly unbalanced in favour of rabbits. The images were scraped from the internet through direct access via URL and saved in ‘.jpg’ or ‘.png’ format. To ensure that the dataset does not contain duplicate images, the difpy (CITE) library was employed to automate the checking process through numerical analysis. 
+
+In collecting the dataset, we ensured that all instances contained only a single subject (i.e., one animal). However, we note that the background environments and subjects’ positioning vary among samples. In particular, the background colour variations indicated that considerations in pre-processing the data may be necessary to generalize the model better and to ensure that the model instead focuses on the subject’s key features. 
+
+For data pre-processing, the image encoding pipeline consisted of five steps employing the CV2 library (CITE) to streamline the process. First, images were scaled and resized concerning the original aspect ratio to reach the target dimensions of 200 by 200 pixels. Next, the images were converted to greyscale using CV2.cvtColor to transform from the RGB colour space using the array conversion in Figure 4.1 below. 
+
+
+% MODIFY FOR FORMATTING 
+Figure 3.1. RGB to Gray Conversion \url{https://docs.opencv.org/3.4/de/d25/imgproc_color_conversions.html#color_convert_rgb_gray}
+
+Once converted, the images were normalized using CV2.normalize with MinMax normalization, alpha and beta set to 0 and 1, respectively. Numerically, the normalization scales the image array elements such that the pixel values fall between the upper boundary (beta) and lower boundary (alpha), as depicted in Figure 4.2 below. This process effectively reduces noise in the data and the dimensionality, which in turn proves helpful in improving convergence while training the model.
+
+% MODIFY FOR FORMATTING
+Figure 3.2. MinMax Normalization 
+\url{https://docs.opencv.org/3.4/d2/de8/group__core__array.html}
+
+Finally, the normalized images are padded and cropped to ensure uniformity before being passed to the model's input layer with a 200 by 200 shape. With respect to the label pre-processing, we employed One-hot encoding using the sklearn (CITE) pre-processing module to create unique binary labels for the data categories, as is standard in classification problems. One-encodings are numerical vectors and can be assigned a weight parameter, which effectively simplifies the model's problem of learning from the categorical features during training \cite{seger2018investigation}. 
+
+
+
+\section{Model Architectures}
+To receive valuable results from our experimentation, we first had to develop a baseline model that they could be built from. Creating this neural network was an iterative process in which we intended to create a model that performed adequately, with room for improvement through experimentation. At the end of this process, we had created a model with three convolution layers of increasing filter quantity and a dropout layer prior to the dense layer. This provided us with baseline training, validation, and testing accuracy of 0.91, 0.69 and 0.53. With the metrics obtained from this model, we were able to evaluate the results from our experiments and gain a more significant measure of whether they positively or negatively impacted the network.
+
+FIGURE HERE
+
+\section{Experiments and Analysis}
+We build a classification system based on a CNN model called the Lepus Classifier, which differentiates between images of eastern cottontail rabbits and European hares for a binary classification task. We explore the design and training process of an image classification neural network, looking to neural network architecture changes and hyperparameter tuning for the core of our experiments. Additionally, we experiment with training algorithms and optimizations. The sections below explore training the CNN using Stratified K-Fold Splitting and various optimization algorithms. We explore modifying convolutional layers in terms of the convolutions, depth, width, and pooling, and consider the implications of dropout and regularization. Additionally, we consider the performance impact of different activation functions.  \boldFULL{FULL EXPERIMENTAL RESULTS ARE IN APPENDIX A}
+
+\subsection{Stratified K-Fold Split}
+\subsection{Batch Size}
+Batch sizes indicate the number of images used to estimate the network’s gradients while training \cite{KANDEL2020312}. Based on the size of our dataset, we opted to experiment with relatively smaller batch sizes. Specifically, we consider batch sizes of 2, 4, 8, 16, and 32 for training with our baseline CNN model for a maximum of 100 epochs. These batch sizes were selected to be powers of 2 to take advantage of GPU architecture for improved performance in training. Smaller batch sizes allow for faster convergence and a regularization effect due to high variance during training. However, reaching an optimum minimum may not be possible \cite{KANDEL2020312}. 
+
+We observed that the best performance came from using a batch size of 2, yielding training, testing, and validation accuracies of 1.0, 0.53, and 0.77, respectively. We note a significant drop in model performance for batch sizes 16 and 32, where the training accuracies drop to below 0.8 and training loss remains above 0.25. Interestingly, the model with batch size 32 achieves a high validation accuracy of 0.77. However, it fails to accurately predict the test set with an accuracy of only 0.47. While batch sizes 4 and 8 achieve comparable training and test results to the model using a batch size of 2, with scores above 0.9 and 0.53, respectively, both models suffer in validation tests. We note that models fail to minimize the validation loss effectively, as they yield losses of 0.94 and 2.34, respectively. Thus, based on our results, a batch size of 2 appears to be the appropriate parameter selection for our task.
+
+\subsection{Optimizers}
+\subsection{Dropout}
+
+Our baseline model showed a divergence between training and validation accuracy over a certain number of steps per fold. While the training accuracy would trend upwards towards 1, the validation accuracy would plateau and eventually decrease. This is due to the model learning the noise in the training image data, which led to poor generalization across the validation and testing datasets. To mitigate this effect, we increased the drop rate. We expanded the number of dropout layers throughout several experiments to observe its regularizing impact on the model’s metrics. The mentality behind this decision was that we knew dropout regularization could make the model more robust through the random dropping of layer outputs (controlled by a drop rate hyperparameter). This effectively simulates the combining of several neural nets and reduces the co-adaptation between nodes that do not generalize (CITE Srivastava). 
+
+In our first two experimental models, we increased the drop rate of our dropout layer from the baseline of 0.2 to 0.4 (Drop01) and then to 0.5 (Drop02). Across these three models, we saw an explainable decrease in training accuracy, from 0.91 to 0.89 and then 0.82, due to the model’s shrinking capacity to memorize information in the training dataset. Of these three models, we noted a maximum validation accuracy of 0.77 for Drop02, which possessed a drop rate of 0.5, a commonly used value. We also added an additional dropout layer after the second convolution layer (Drop03) to continue this trend. However, for this model, the training accuracy and validation accuracy both dropped to 0.65 and 0.69, respectively. Though the gap between these two values had reduced, the information loss from the dropout layers reduced the model’s capacity to label the image data accurately.
+
+
+\subsection{Pooling}
+
+Pooling layers are a common element in Convolutional Neural Networks. They reduce the number of learn-able parameters in a model and make it more robust by summarising regions in the feature map (CITE Gholamalinezhad, Khosravi). The most commonly applied pooling method is Max Pooling, which maps the maximum value within the filter to the output. This approach effectively retained the most notable features in the map and utilized our baseline model. Average pooling, however, maps the average of all the values in the filter to the output, preserving a downsized representation of the feature map. For this experiment, we wished to compare our baseline with a model that utilized Average Pooling layers and determine which was better suited to classifying our Lepus image data.
+
+The outcome of the average pooling model (Pool01) was a significant decrease in training accuracy in comparison to the baseline model (from 0.91 to 0.69) but also a significant increase in validation accuracy (from 0.69 to 0.85). The test accuracy remained barely impacted, dropping from 0.53 to 0.47. This is indicative that the average pooling model generalized better from the training data to the validation data than the Max Pooling baseline model. We believe that this was due to the max-pooling model highlighting features that were irrelevant to the classification of the image, such as bright elements in the background, leading to the memorization of the training set. The more excellent representation of all elements in the model through average pooling may have led to this increase in validation accuracy.
+
+
+\subsection{Convolutions}
+
+
+
+\subsection{Width}
+\subsection{Depth}
+\subsection{Hidden-Layer Activations}
+In our experiments, we modify the activation functions of the hidden layers in our baseline CNN architecture to observe their impact on training and hyperparameter fine-tuning. We employ ReLU, Tanh, and logistic sigmoid activation functions for this task since they are among the most used. We note that ReLU was selected as our default activation function for our baseline architecture due to the simplicity of its computational requirements.
+
+Using ReLU activations, the model achieved training, testing, and validation accuracies of 1.0, 0.53, and 0.92, respectively. We note a large discrepancy between the testing and validation scores. However, the model can minimize the loss function effectively enough. It is possible that the simplicity of the ReLU activation’s gradients may be causing a challenge in training a complex, feature-driven network to handle the Lepus data. With the Tanh activation, the network achieves a far better-balanced performance than previous iterations, with training, testing, and validation accuracies of 1.0, 0.65, and 0.62, respectively. We note that the loss functions across all three sets are significantly minimized with Tanh activations than ReLU and logistic sigmoid. Finally, with logistic sigmoid, accuracies of 0.64, 0.47, and 0.62 across the train, test, and validation sets, the poorest performance in this set of experiments by a large margin. This behaviour is not unexpected based on the mathematical characteristics of this function, as discussed in section 2.3. Based on the performance in these experiments, Tanh activation trains a more consistent, well-rounded network that can capture the complexity of the Lepus data more effectively.
+
+
+\subsection{Regularization}
+\section{Discussion}
+\section{Conclusion}
+
+
+
+\bibliographystyle{IEEEtranN}
+\bibliography{References}
+
+
+\medskip
+
+
+SAMPLE REFERENCES
+
+
+\appendix
+
+\section{Appendix}
+
+ADD WANB REPORTS HERE? LINKS TO GITHUB
+
+\end{document}
