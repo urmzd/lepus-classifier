@@ -112,6 +112,3 @@ def bootstrap(
 
     trainer.logger.finalize("success")
 
-
-if __name__ == "__main__":
-    bootstrap()
