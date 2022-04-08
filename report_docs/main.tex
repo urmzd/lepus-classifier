@@ -27,6 +27,9 @@
 \usepackage{nicefrac}       % compact symbols for 1/2, etc.
 \usepackage{microtype}      % microtypography
 \usepackage{xcolor}         % colors
+\usepackage{graphicx}
+\graphicspath{ {images/} }
+
 
 \title{The Lepus Classifier: Exploring Image Classification with Convolutional Neural Networks}
 
@@ -76,12 +79,16 @@ Artificial Neural Networks (ANN) are a type of computation model designed to rep
 \centerline{$a = \phi(\sum_{j} w_{j}x_{j} + b)$ \cite{grosse2019lecture03}}
 \newline
 
-To build an ANN, we organize a corresponding sequence of artificial neurons. They operate in parallel to map an input \emph{X} to a linear or non-linear function output \cite{https://doi.org/10.1002/cpe.6767,seger2018investigation}. The neurons are organized into a series of interconnected layers to produce a function mapping with input \emph{X} to an output \emph{Y}. The first layer is an input layer, followed by a series of hidden layers that receive input from the previous layer before passing the transformations to an output layer to produce the final output \emph{Y}, as shown in Figure 2.1 below. 
-\newline
-\newline
-Figure 2.1 (JENA ET AL FIGURE 1) 
-\newline
-\newline
+To build an ANN, we organize a corresponding sequence of artificial neurons. They operate in parallel to map an input \emph{X} to a linear or non-linear function output \cite{https://doi.org/10.1002/cpe.6767,seger2018investigation}. The neurons are organized into a series of interconnected layers to produce a function mapping with input \emph{X} to an output \emph{Y}. The first layer is an input layer, followed by a series of hidden layers that receive input from the previous layer before passing the transformations to an output layer to produce the final output \emph{Y}, as shown in Figure 1 below.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.75]{NN_figure.png}
+    \caption{Simple Neural Network Architecture, adapted from \cite{https://doi.org/10.1002/cpe.6767}}
+    \label{fig:my_label}
+\end{figure}
+
+
 Mathematically, a simple neural network with two hidden layers can be represented by the equations shown below, where \emph{h} is a layer, and \emph{y} is the output of the final activation function with respect to the previous layer. In this case, the hidden layers are called fully-connected or dense layers since the neuron units are directly connected to the previous layer’s neurons \cite{grosse2019lecture03}.
 \newline
 \newline
@@ -186,12 +193,16 @@ Figure 3.2. MinMax Normalization
 
 Finally, the normalized images are padded and cropped to ensure uniformity before being passed to the model's input layer with a 200 by 200 shape. With respect to the label pre-processing, we employed One-hot encoding using the scikit-learn \cite{scikit-learn} pre-processing module to create unique binary labels for the data categories, as is standard in classification problems. One-encodings are numerical vectors and can be assigned a weight parameter, which effectively simplifies the model's problem of learning from the categorical features during training \cite{seger2018investigation}. 
 
-
-
 \section{Model Architectures}
-To receive valuable results from our experimentation, we first had to develop a baseline model that they could be built from. Creating this neural network was an iterative process in which we intended to create a model that performed adequately, with room for improvement through experimentation. At the end of this process, we had created a model with three convolution layers of increasing filter quantity and a dropout layer prior to the dense layer. This provided us with baseline training, validation, and testing accuracy of 0.91, 0.69 and 0.53. With the metrics obtained from this model, we were able to evaluate the results from our experiments and gain a more significant measure of whether they positively or negatively impacted the network.
+To receive valuable results from our experimentation, we first had to develop a baseline model that they could be built from. Creating this neural network was an iterative process in which we intended to create a model that performed adequately, with room for improvement through experimentation. At the end of this process, we had created a model with three convolution layers of increasing filter quantity and a dropout layer prior to the dense layer. This provided us with baseline training, validation, and testing accuracy of 0.91, 0.69 and 0.53. With the metrics obtained from this model, we were able to evaluate the results from our experiments and gain a more significant measure of whether they positively or negatively impacted the network. Our baseline architecture is shown in Figure 2 below.
+\newline
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.65]{CNN.png}
+    \caption{Lepus Classifier Baseline CNN Architecture}
+    \label{fig:my_label}
+\end{figure}
 
-FIGURE HERE
 
 \section{Experiments and Analysis}
 We build a classification system based on a CNN model called the Lepus Classifier, which differentiates between images of eastern cottontail rabbits and European hares for a binary classification task. We explore the design and training process of an image classification neural network, looking to neural network architecture changes and hyperparameter tuning for the core of our experiments. Additionally, we experiment with training algorithms and optimizations. The sections below explore training the CNN using Stratified K-Fold Splitting and various optimization algorithms. We explore modifying convolutional layers in terms of the convolutions, depth, width, and pooling, and consider the implications of dropout and regularization. Additionally, we consider the performance impact of different activation functions.  \boldFULL{FULL EXPERIMENTAL RESULTS ARE IN APPENDIX A}
@@ -232,6 +243,9 @@ To further improve the model's predictive capacity, we determined that we should
 First we created a model (Depth01) which possessed an additional convolution layer and max pooling layer prior to the dense layer. In comparison to our baseline, the training accuracy went increased to 1 in comparison to the baseline 0.91, while the validation accuracy also increased from 0.69 to 0.77. Test accuracy, however, decreased from 0.53 to 0.41. Similar to the previous convolutions experiment, we believe that the increased quantity of parameters led to overfitting on the training set, raising it to 1 while diminishing the test accuracy. For the second model of this experiment (Depth02), we included an additional dropout layer with a drop rate of 0.5 after the final max pooling layer to mitigate the overfitting. This resulted in an improved test accuracy from 0.41 to 0.47 and a reduction in training and validation accuracy to 0.91 and 0.69 respectively. It is clear the additional dropout layer reduced the memorization of the training set, however Depth02, with its greater quantity of parameters, does not improve any metric in comparison to the baseline model.
 
 \subsection{Width}
+
+
+
 \subsection{Hidden-Layer Activations}
 In our experiments, we modify the activation functions of the hidden layers in our baseline CNN architecture to observe their impact on training and hyperparameter fine-tuning. We employ ReLU, Tanh, and logistic sigmoid activation functions for this task since they are among the most used. We note that ReLU was selected as our default activation function for our baseline architecture due to the simplicity of its computational requirements.
 
