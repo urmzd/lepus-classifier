@@ -30,7 +30,7 @@ from torchmetrics import (
 )
 
 import wandb
-from src.data.data_extractor import download_image, get_data, get_image
+from src.data.data_extractor import download_image_from_link, extract_path_from_link, get_image, get_data, get_image
 from src.data.data_processing import get_target_encoder
 from src.data.data_types import FeaturesEncoder, TargetEncoder
 
@@ -62,7 +62,7 @@ class LepusDataset(Dataset):
     def __getitem__(self, idx):
         image_link = self.features[idx]
         image_label = self.targets[idx]
-        image_path = download_image(image_link, self.image_folder_path)
+        image_path = extract_path_from_link(image_link, self.image_folder_path)
         image = get_image(image_path)
 
         if self.transform is not None:
@@ -85,22 +85,19 @@ class LepusStratifiedKFoldDataModule(StratifiedKFoldDataModule):
     train_size: float = 0.8
 
     def prepare_data(self) -> None:
-        if (
-            self.data_manifest_path is not None
-            and self.image_folder_path is not None
-            and self.transform_features is not None
-        ):
-            self.data = get_data(self.data_manifest_path).to_numpy()
-        else:
-            raise ValueError("data_manifest_path must be a Path object.")
+        data = get_data(self.data_manifest_path).to_numpy()
+        for image_link in data[:, 1]:
+            download_image_from_link(image_link, self.image_folder_path)
 
     def setup(self, stage: Optional[str] = None):
+        data = get_data(self.data_manifest_path).to_numpy()
+
         if self.transform_targets:
-            self.target_encoder = get_target_encoder(self.data[:, 0])
+            self.target_encoder = get_target_encoder(data[:, 0])
         else:
             self.target_encoder = None
 
-        train_set, test_set = train_test_split(self.data, train_size=self.train_size)
+        train_set, test_set = train_test_split(data, train_size=self.train_size)
         self.train_dataset, self.test_dataset = train_set, test_set
 
         features, targets = train_set[:, 1], train_set[:, 0]
