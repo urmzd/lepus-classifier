@@ -70,10 +70,67 @@ In the scope of this project, we consider the supervised learning problem of ima
 
 \section{Theoretical Background}
 \subsection{Neural Networks}
+
 \subsection{Convolutional Neural Networks}
+
 \subsection{Activation Functions}
+Activation functions are critical to generating the output of neurons, effectively defining the mathematical characteristics of the neural network (CITE Activation Paper). Specifically, the activation function’s derivatives and gradients are essential to training a neural network, particularly when computing hyperparameter optimizations. Common activation functions include logistic sigmoid, Tanh, ReLU, and SoftMax. 
+
+Sigmoid functions are smooth curves with one inflection point bound to a defined interval. Logistic sigmoid activation functions are commonly employed in neural networks, mainly since it provides a smooth approximation of a binary function, also called a step-function (CITE Activation paper). 
+
+INSERT EQUATION \& GRAPH
+
+For hidden layers, logistic sigmoid functions can be detrimental to a network’s training because of the saturation of values across the domain. In particular, the function lacks sensitivity when the input is very large or very negative, making gradient-based learning computationally challenging for networks (CITE DEEPLEARNING BOOK PT2). It is only sensitive at the mid-point. Additionally, the function is known to struggle with the vanishing gradient problem during network backpropagation, leading to further challenges for multi-layer networks in training as layers are unable to update their parameters effectively. For this reason, logistic sigmoid functions are not generally used for hidden layer activations. Instead, they are employed more frequently for output units since applying a loss function at the final layer can effectively mitigate the impact of the inherent saturation issue (CITE DEEPLEARNING). 
+
+INSERT EQUATION AND GRAPH
+
+The hyperbolic tangent function, Tanh, is another type of sigmoid function with similar properties to the logistic sigmoid function. In essence, the Tanh function is “a shifted and scaled version” of the logistic sigmoid function (CITE ACTIVATION PAPER). However, Tanh functions generally perform better than the logistic function in training neural networks, and, as such, are the preferred sigmoid activation function (CITE DEEPLEARNING).  
+
+INSERT EQUATION AND GRAPH
+
+The ReLU (Rectified Linear Unit) function is frequently used because of the simplicity of its implementation and gradients allow for easy optimization and reduced computation requirements (CITE ACTIVATION PAPER, DLB). It is highly similar to a linear unit, however, the rectification zeros the output for half the domain, keeping gradients consistently large upon activation (CITE DLB). This activation has its own form of a vanishing-gradient problem where many units may be inactive during training, which is especially detrimental when dealing with high complexity models (CITE ACTIVATION PAPER). 
+
+INSERT EQUATION AND GRAPH
+
+The SoftMax regression function is used in multi-class classification tasks for output layer units, calculating the likelihood of each target class over all classes.  It is based on the logistic sigmoid function, which maps the class probabilities to a binary output, but modified to suit multiple classes (CITE STANFORD).
+
+INSERT EQUATION AND GRAPH
+
+We note that for output layers, it is common to use Sigmoid or SoftMax activation functions to define the final output for classification problems. SoftMax is commonly employed in multi-class classification, while Sigmoid is well suited to multi-label classification problems where outputs are not mutually exclusive (GLBMED).
+
+\url{https://arxiv.org/pdf/2101.09957.pdf 	}
+\url{https://www.hindawi.com/journals/wcmc/2020/6677907/}
+\url{https://glassboxmedicine.com/2019/05/26/classification-sigmoid-vs-softmax/ 	}
+\url{http://deeplearning.stanford.edu/tutorial/supervised/SoftmaxRegression/ }
+
 \subsection{Loss Functions}
-\subsection{Optimizers}
+Cost functions are essential to gradient-based learning in neural networks, specifically by providing a measure to minimize during training for optimization processes. The cost function provides a metric to quantify the difference between predicted or estimated values and actual values. In gradient-based learning, the cost function is iteratively optimized by approximating its gradients where it may not be feasible computationally otherwise (CITE DLB). Among the most common cost functions is the negative log-likelihood loss, which is particularly useful in classification problems (CITE PYTORCH). The maximum likelihood estimation will be yielded upon minimizing negative log-likelihood loss. The trained neural network will select the highest probability target class as a prediction as a result (CITE DLB).
+	
+	INSERT EQUATION
+
+\url{https://pytorch.org/docs/stable/generated/torch.nn.NLLLoss.html }
+
+\subsection{Optimization Algorithms}
+Optimizers are used to minimize loss functions during neural network training processes, effectively improving model performance through internal parameter updates (CITE ieee paper). Specifically, parameter updates are performed once backpropagation is completed such that the gradient is fully completed. Among the most common optimizers are Stochastic Gradient Descent (SGD), AdaGrad, RMSProp, and Adam.  
+
+SGD is a well-known optimization algorithm where the parameter update occurs by following the negative gradient direction such that the loss function is being minimized (CITE IEEE and STANFORD). The gradient effectively describes the direction to follow such that the minima of the loss function will be approached quickly. The update process utilizes the learning rate multiplied by the gradient to iteratively adjust parameters until convergence (CITE IEEE), as shown in the formula below.
+	INSERT EQUATION
+
+AdaGrad is an algorithm that provides adaptive learning rates for training neural networks. It reduces the advancement towards the loss function minima over time by computing the parameter-wise sum of squared gradients to normalize the update step (CITE STAN, IEEE). As a result, the learning rates are adjusted based on how large a parameter’s gradient is, meaning that parameters with larger gradients will have the learning rate reduced or increased in the case of smaller ones (CITE STAN). 
+	INSERT EQUATION
+
+RMSProp, which stands for Root Mean Square Propagation, relies on an exponentially weighted average of gradients, instead of the gradients computed each training epoch, to compute the parameter updates. It is, in essence, a less aggressive form of the AdaGrad optimizer (CITE STAN, IEEE). The formula below describes the parameter update
+		INSERT EQUATION
+
+The Adam optimizer is often recommended as a default algorithm due to its robust experimental performance (CITE STANFORD), as it provides an efficient stochastic gradient descent using adaptive estimation derived from the first and second order gradient moments (CITE IEEE). It is essentially a mixture of the RMSProp and AdaGrad methods described in detail above, with a better ability to generalize performance (CITE Stanford,Cornell). The core difference being that Adam uses the average of the second order gradient moments to compute the parameter updates, while RMSProp uses first order (CITE Cornell).
+		INSERT EQUATION
+
+
+
+-	https://cs231n.github.io/neural-networks-3/ 
+-	https://ieeexplore-ieee-org.ezproxy.library.dal.ca/document/8862686
+-	https://optimization.cbe.cornell.edu/index.php?title=Adam 
+
 
 \section{Data Collection and Pre-Processing}
 To build our dataset, we collected 87 images, 47 of which were Eastern cottontail rabbits and 39 European hares, respectively. The images are labelled under one of two categories, rabbit or hare, with respect to the appropriate species to frame the binary classification task. Evidently, the class distribution is slightly unbalanced in favour of rabbits. The images were scraped from the internet through direct access via URL and saved in ‘.jpg’ or ‘.png’ format. To ensure that the dataset does not contain duplicate images, the difpy (CITE) library was employed to automate the checking process through numerical analysis. 
@@ -98,7 +155,29 @@ Finally, the normalized images are padded and cropped to ensure uniformity befor
 
 
 \section{Model Architectures}
+
+
 \section{Experiments and Analysis}
+We build a classification system based on a CNN model called the Lepus Classifier, which differentiates between images eastern cottontail rabbits and European hares for a binary classification task. We explore the design and training process of an image classification neural network, looking to neural network architecture changes and hyperparameter tuning for the core of our experiments. Additionally, we experiment with training algorithms and optimizations. The sections below explore training the CNN using Stratified K-Fold Splitting and various optimization algorithms. We explore modifying convolutional layers in terms of the convolutions, depth, width, and pooling, and consider the implications of dropout and regularization. Additionally, we consider the performance impact of different activation functions.  FULL EXPERIMENTAL RESULTS ARE IN APPENDIX A
+
+\subsection{Stratified K-Fold Split}
+\subsection{Batch Size}
+Batch sizes indicate the number of images used to estimate the network’s gradients while training (CITE KANDEL). Based on the size of our dataset, we opted to experiment with relatively smaller batch sizes. Specifically, we consider batch sizes of 2, 4, 8, 16, and 32 for training with our baseline CNN model for a maximum of 100 epochs. These batch sizes were selected to be powers of 2 to take advantage of GPU architecture for improved performance in training. Smaller batch sizes allow for faster convergence and a regularization effect due to high variance during training. However, reaching an optimum minimum may not be possible (CITE KANDEL). 
+
+We observed that the best performance came from using a batch size of 2, yielding training, testing, and validation accuracies of 1.0, 0.53, and 0.77, respectively. We note a significant drop in model performance for batch sizes 16 and 32, where the training accuracies drop to below 0.8 and training loss remains above 0.25. Interestingly, the model with batch size 32 achieves a high validation accuracy of 0.77. However, it fails to accurately predict the test set with an accuracy of only 0.47. While batch sizes 4 and 8 achieve comparable training and test results to the model using a batch size of 2, with scores above 0.9 and 0.53, respectively, both models suffer in validation tests. We note that models fail to minimize the validation loss effectively, as they yield losses of 0.94 and 2.34, respectively. Thus, based on our results, a batch size of 2 appears to be the appropriate parameter selection for our task.
+
+\url{https://reader.elsevier.com/reader/sd/pii/S2405959519303455?token=5D7107B1B0DA7973C056AD726332190EF4137562459C28709580B9EADFBF93F64DEA4E56D6C87F2A35680CE6D0E3A95A&originRegion=us-east-1&originCreation=20220407131130}
+
+\subsection{Optimizers}
+\subsection{Dropout}
+\subsection{Pooling}
+\subsection{Convolutions}
+\subsection{Width}
+\subsection{Depth}
+\subsection{Activation}
+\subsection{Regularization}
+
+\
 \section{Discussion}
 \section{Conclusion}
 \section*{References}
