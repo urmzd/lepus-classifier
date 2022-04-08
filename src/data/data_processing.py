@@ -140,14 +140,6 @@ def get_image_encoder(
     )
 
 
-def get_target_processors():
-    pass
-
-
-def get_feature_processors():
-    pass
-
-
 def get_target_encoder(target: np.ndarray) -> TargetEncoder:
     label_encoder = LabelEncoder().fit(target)
 
