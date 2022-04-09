@@ -46,28 +46,23 @@ class TrainerFactory:
     project_name = PROJECT_NAME
     run_name: Optional[str] = RUN_NAME
 
-    def __post_init__(self):
-        self.logger = WandbLogger(project=PROJECT_NAME, log_model="all")
-
     def get_trainer(self, **kwargs):
-        if self.logger is not None:
-            trainer = Trainer(
-                max_epochs=self.max_epochs,
-                limit_train_batches=None,
-                limit_val_batches=None,
-                limit_test_batches=None,
-                num_sanity_val_steps=0,
-                devices=self.devices,
-                accelerator="auto",
-                strategy=self.strategy,
-                logger=self.logger,
-                callbacks=self.callbacks,
-                deterministic=self.deterministic,
-                **kwargs
-            )
-            return trainer
-
-        raise ValueError("Expected self.logger to exist.")
+        self.logger = WandbLogger(project=PROJECT_NAME, log_model="all")
+        trainer = Trainer(
+            max_epochs=self.max_epochs,
+            limit_train_batches=None,
+            limit_val_batches=None,
+            limit_test_batches=None,
+            num_sanity_val_steps=0,
+            devices=self.devices,
+            accelerator="auto",
+            strategy=self.strategy,
+            logger=self.logger,
+            callbacks=self.callbacks,
+            deterministic=self.deterministic,
+            **kwargs
+        )
+        return trainer
 
 
 @logger.catch
