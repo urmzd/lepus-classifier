@@ -3,6 +3,7 @@ from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Type
+from loguru import logger
 
 import numpy as np
 import plotly.express as px
@@ -209,7 +210,7 @@ class StratifiedKFoldLoop(Loop):
         )
 
     def on_advance_start(self, *args: Any, **kwargs: Any) -> None:
-        wandb.log({"fold": self.current_fold})
+        logger.info(f"STARTING FOLD # {self.current_fold}")
         assert isinstance(self.trainer.datamodule, StratifiedKFoldDataModule)
         self.trainer.datamodule.setup_fold_using_index(self.current_fold)
 
