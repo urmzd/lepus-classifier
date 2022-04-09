@@ -366,7 +366,6 @@ class MetricsCallback(pl.Callback):
         pl_module: "pl.LightningModule",
     ) -> None:
         self.train_metrics = self.train_metrics.to(pl_module.device)
-        self.state["epoch"] += 1
 
     def on_validation_start(
         self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"
@@ -411,14 +410,8 @@ class MetricsCallback(pl.Callback):
     ) -> None:
         self._log_metric_on_batch(self.test_metrics, outputs, trainer, "test")
 
-    def on_train_epoch_start(
-        self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"
-    ) -> None:
-        self.state["epoch"] += 1
 
-    def on_test_epoch_start(
-        self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"
-    ) -> None:
+    def on_train_epoch_start(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule") -> None:
         self.state["epoch"] += 1
 
     def on_train_epoch_end(
@@ -430,6 +423,11 @@ class MetricsCallback(pl.Callback):
         self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"
     ) -> None:
         self._log_metric_on_epoch_end(self.val_metrics, trainer)
+
+    def on_test_epoch_start(
+        self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"
+    ) -> None:
+        self.state["epoch"] += 1
 
     def on_test_epoch_end(
         self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"
