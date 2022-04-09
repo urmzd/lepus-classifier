@@ -16,16 +16,11 @@ def get_data(data_path: Path) -> pd.DataFrame:
 
     raise Exception("This should never happen.")
 
+
 @lru_cache()
 def extract_path_from_link(link: str, image_folder_path: Path) -> Path:
-    """Extract the image path from the specified link.
-
-    View  : https://regex101.com/r/3bhDMM/1
-    Delete: https://regex101.com/delete/N5sItwbrPF73ZllTnRDltxZ1
-    """
-    file_name_regex = re.compile(
-        r".*\/(.*(\.(jpeg|jpg|png))?)\??.*", flags=re.IGNORECASE
-    )
+    """Extract the image path from the specified link."""
+    file_name_regex = re.compile(r".*\/(.*\.(jpeg|jpg|png)?)\??", flags=re.IGNORECASE)
     regex_matches = file_name_regex.match(link)
 
     if not regex_matches:
@@ -39,6 +34,7 @@ def extract_path_from_link(link: str, image_folder_path: Path) -> Path:
     file_path = image_folder_path / file_name
 
     return file_path
+
 
 def download_image_from_link(link: str, image_folder_path: Path) -> Path:
     file_path = extract_path_from_link(link, image_folder_path)
@@ -56,6 +52,7 @@ def download_image_from_link(link: str, image_folder_path: Path) -> Path:
         handle.write(image.content)
 
     return file_path
+
 
 def get_image(file_path: Path) -> Image:
     image = cv2.imread(str(file_path))

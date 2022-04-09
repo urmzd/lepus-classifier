@@ -9,15 +9,44 @@ from typing import List, Optional, Union
 from loguru import logger
 from pytorch_lightning import Callback, Trainer, seed_everything
 from pytorch_lightning.loggers import WandbLogger
+import torch
 
 import wandb
 from src.data.data_handler import (
-    BasicModel,
+    BaseModel,
     LepusStratifiedKFoldDataModule,
     MetricsCallback,
     StratifiedKFoldLoop,
 )
 from src.data.data_processing import get_image_encoder
+import math
+
+class AdaGradModel(BaseModel):
+  def __init__(self, n_targets=2, learning_rate=0.02):
+      super().__init__(n_targets=n_targets, learning_rate=learning_rate)
+      self.layer1 = torch.nn.Conv2d(1, 20, 2, 2)
+      self.layer2= torch.nn.MaxPool2d(2, 2)
+      self.layer3=torch.nn.Conv2d(20, 200, 2)
+      self.layer4=torch.nn.MaxPool2d(2, 2)
+      self.layer5=torch.nn.Flatten(start_dim=1)
+      self.layer6=torch.nn.ReLU()
+      self.layer7=torch.nn.Linear(int(math.pow(24,2)) * 200, 2)
+      self.layer8=torch.nn.LogSoftmax()
+      super().__post_init__()
+
+  def forward(self, x):
+      res_1 = self.layer1(x)
+      res_2 = self.layer2(res_1)
+      res_3 = self.layer3(res_2)
+      res_4 = self.layer4(res_3)
+      res_5 = self.layer5(res_4)
+      res_6 = self.layer6(res_5)
+      res_7 = self.layer7(res_6)
+      res_8 = self.layer8(res_7)
+      return res_8
+
+  def configure_optimizers(self):
+      return torch.optim.Adagrad(self.parameters(), self.learning_rate)
 
 LOG_LEVEL = "INFO"
 DATA_MANFIEST_PATH = Path("./resources/data.csv")
@@ -69,7 +98,7 @@ class TrainerFactory:
 
 
 def bootstrap(
-    model=BasicModel(learning_rate=LEARNING_RATE),
+    model=AdaGradModel(learning_rate=LEARNING_RATE),
     log_level=LOG_LEVEL,
     data_manfiest_path=DATA_MANFIEST_PATH,
     image_folder_path=IMAGE_FOLDER_PATH,

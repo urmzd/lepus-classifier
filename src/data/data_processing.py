@@ -22,9 +22,10 @@ def change_image_to_greyscale(img: Image) -> Image:
 
 
 def normalize_image(img: Image) -> Image:
-    return cv2.normalize(
+    normalized_image = cv2.normalize(
         img, None, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F
     )
+    return normalized_image
 
 
 def resize_image(
