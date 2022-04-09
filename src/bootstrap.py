@@ -10,6 +10,7 @@ from loguru import logger
 from pytorch_lightning import Callback, Trainer, seed_everything
 from pytorch_lightning.loggers import WandbLogger
 from src.data.data_handler import (
+    BasicModel,
     LepusStratifiedKFoldDataModule,
     MetricsCallback,
     StratifiedKFoldLoop,
@@ -66,7 +67,7 @@ class TrainerFactory:
 
 
 def bootstrap(
-    model=AdaGradModel(learning_rate=LEARNING_RATE),
+    model=BasicModel(learning_rate=LEARNING_RATE),
     log_level=LOG_LEVEL,
     data_manfiest_path=DATA_MANFIEST_PATH,
     image_folder_path=IMAGE_FOLDER_PATH,
