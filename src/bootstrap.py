@@ -70,6 +70,7 @@ class TrainerFactory:
         raise ValueError("Expected self.logger to exist.")
 
 
+@logger.catch
 def bootstrap(
     model=BasicModel(learning_rate=LEARNING_RATE),
     log_level=LOG_LEVEL,
