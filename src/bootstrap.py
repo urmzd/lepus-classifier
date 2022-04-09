@@ -37,7 +37,7 @@ def get_default_callbacks() -> List[Callback]:
 
 @dataclass
 class TrainerFactory:
-    logger: WandbLogger = WandbLogger(project=PROJECT_NAME, log_model="all")
+    logger: Optional[WandbLogger] = None
     callbacks: List[Callback] = field(default_factory=get_default_callbacks)
     strategy: str = "ddp"
     max_epochs: int = 10
@@ -46,22 +46,28 @@ class TrainerFactory:
     project_name = PROJECT_NAME
     run_name: Optional[str] = RUN_NAME
 
+    def __post_init__(self):
+        self.logger = WandbLogger(project=PROJECT_NAME, log_model="all")
+
     def get_trainer(self, **kwargs):
-        trainer = Trainer(
-            max_epochs=self.max_epochs,
-            limit_train_batches=None,
-            limit_val_batches=None,
-            limit_test_batches=None,
-            num_sanity_val_steps=0,
-            devices=self.devices,
-            accelerator="auto",
-            strategy=self.strategy,
-            logger=self.logger,
-            callbacks=self.callbacks,
-            deterministic=self.deterministic,
-            **kwargs
-        )
-        return trainer
+        if self.logger is not None:
+            trainer = Trainer(
+                max_epochs=self.max_epochs,
+                limit_train_batches=None,
+                limit_val_batches=None,
+                limit_test_batches=None,
+                num_sanity_val_steps=0,
+                devices=self.devices,
+                accelerator="auto",
+                strategy=self.strategy,
+                logger=self.logger,
+                callbacks=self.callbacks,
+                deterministic=self.deterministic,
+                **kwargs
+            )
+            return trainer
+
+        raise ValueError("Expected self.logger to exist.")
 
 
 def bootstrap(
