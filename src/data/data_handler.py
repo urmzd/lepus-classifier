@@ -342,12 +342,12 @@ class MetricState(TypedDict):
 
 
 class MetricsCallback(pl.Callback):
-    def __init__(self, n_targets=2):
+    def __init__(self, n_targets=2, accuracy_average="micro", default_average="macro"):
         metrics = MetricCollection(
-            Accuracy(num_classes=n_targets),
-            Precision(num_classes=n_targets),
-            F1Score(num_classes=n_targets),
-            Recall(num_classes=n_targets),
+            Accuracy(num_classes=n_targets, average=accuracy_average),
+            Precision(num_classes=n_targets, average=default_average),
+            F1Score(num_classes=n_targets, average=default_average),
+            Recall(num_classes=n_targets, average=default_average),
             ConfusionMatrix(num_classes=n_targets),
         )
 
