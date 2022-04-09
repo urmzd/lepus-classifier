@@ -2,7 +2,7 @@ import sys
 from dataclasses import dataclass, field
 from functools import partial
 from pathlib import Path
-from typing import List, Optional, Union, Any
+from typing import List, Optional, Union, Any, Dict
 
 from loguru import logger
 from pytorch_lightning import Callback, Trainer, seed_everything
