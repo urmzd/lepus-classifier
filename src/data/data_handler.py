@@ -362,6 +362,11 @@ class MetricsCallback(pl.Callback):
     def state_dict(self) -> MetricState:
         return self.state.copy()
 
+    def on_fit_start(
+        self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"
+    ) -> None:
+        self.state.fold += 1
+
     def on_train_start(
         self,
         trainer: "pl.Trainer",
