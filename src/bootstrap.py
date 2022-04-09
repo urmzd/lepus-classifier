@@ -2,7 +2,7 @@ import sys
 from dataclasses import dataclass, field
 from functools import partial
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Any
 
 from loguru import logger
 from pytorch_lightning import Callback, Trainer, seed_everything
@@ -79,6 +79,7 @@ def bootstrap(
     export_path=EXPORT_PATH,
     seed_no=SEED_NO,
     trainer_factory: TrainerFactory = TrainerFactory(),
+    trainer_kwargs: Dict[str, Any]
 ):
     export_path.mkdir(exist_ok=True, parents=True)
     image_folder_path.mkdir(exist_ok=True, parents=True)
@@ -104,7 +105,7 @@ def bootstrap(
         n_splits=num_folds,
     )
 
-    trainer = trainer_factory.get_trainer()
+    trainer = trainer_factory.get_trainer(**trainer_kwargs)
 
     internal_fit_loop = trainer.fit_loop
     trainer.fit_loop = StratifiedKFoldLoop(num_folds, export_path=export_path)
