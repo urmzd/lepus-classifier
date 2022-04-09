@@ -113,7 +113,7 @@ def bootstrap(
     trainer.fit_loop.connect(internal_fit_loop)
     trainer.fit(model, datamodule)
 
-    trainer.logger.finalize("success")
+    trainer_factory.logger.finalize("success")
 
 
 if __name__ == "__main__":
