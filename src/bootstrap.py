@@ -46,8 +46,8 @@ class TrainerFactory:
     project_name = PROJECT_NAME
     run_name: Optional[str] = RUN_NAME
 
-    def get_trainer(self, **kwargs):
-        self.logger = WandbLogger(project=PROJECT_NAME, log_model="all")
+    def get_trainer(self, logger_kwargs: Dict[str, Any], trainer_kwargs: Dict[str, Any]):
+        self.logger = WandbLogger(project=PROJECT_NAME, log_model="all", **logger_kwargs)
         trainer = Trainer(
             max_epochs=self.max_epochs,
             limit_train_batches=None,
@@ -60,7 +60,7 @@ class TrainerFactory:
             logger=self.logger,
             callbacks=self.callbacks,
             deterministic=self.deterministic,
-            **kwargs
+            **trainer_kwargs
         )
         return trainer
 
@@ -79,6 +79,7 @@ def bootstrap(
     export_path=EXPORT_PATH,
     seed_no=SEED_NO,
     trainer_factory: TrainerFactory = TrainerFactory(),
+    logger_kwargs: Dict[str, Any] = {},
     trainer_kwargs: Dict[str, Any] = {}
 ):
     export_path.mkdir(exist_ok=True, parents=True)
@@ -105,7 +106,7 @@ def bootstrap(
         n_splits=num_folds,
     )
 
-    trainer = trainer_factory.get_trainer(**trainer_kwargs)
+    trainer = trainer_factory.get_trainer(logger_kwargs, trainer_kwargs)
 
     internal_fit_loop = trainer.fit_loop
     trainer.fit_loop = StratifiedKFoldLoop(num_folds, export_path=export_path)
