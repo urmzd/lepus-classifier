@@ -212,7 +212,7 @@ class StratifiedKFoldLoop(Loop):
         )
 
     def on_advance_start(self, *args: Any, **kwargs: Any) -> None:
-        logger.info(f"STARTING FOLD {self.current_fold}")
+        wandb.log({"fold": self.current_fold})
         assert isinstance(self.trainer.datamodule, StratifiedKFoldDataModule)
         self.trainer.datamodule.setup_fold_using_index(self.current_fold)
 
@@ -362,11 +362,6 @@ class MetricsCallback(pl.Callback):
     def state_dict(self) -> MetricState:
         return self.state.copy()
 
-    def on_fit_start(
-        self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"
-    ) -> None:
-        self.state.fold += 1
-
     def on_train_start(
         self,
         trainer: "pl.Trainer",
@@ -432,6 +427,7 @@ class MetricsCallback(pl.Callback):
         self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"
     ) -> None:
         self._log_metric_on_epoch_end(self.test_metrics, trainer)
+        self.state["fold"] += 1
 
     def _log_metric_on_epoch_end(
         self,

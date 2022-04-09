@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import sys
 from dataclasses import dataclass, field
 from functools import partial
