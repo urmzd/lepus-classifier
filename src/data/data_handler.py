@@ -180,7 +180,6 @@ class EnsembleVotingModel(pl.LightningModule):
         self.models = torch.nn.ModuleList(
             [model_cls.load_from_checkpoint(p) for p in checkpoint_paths]
         )
-        self.table = wandb.Table(columns=[""])
 
     def test_step(self, batch: Any, dataloader_idx: int = 0) -> StepOutputDict:
         logits = torch.stack([m(batch[0]) for m in self.models]).mean(0)
@@ -335,7 +334,6 @@ class MetricsState(TypedDict):
 
 
 class MetricState(TypedDict):
-    fold: int
     epoch: int
 
 
@@ -411,6 +409,16 @@ class MetricsCallback(pl.Callback):
     ) -> None:
         self._log_metric_on_batch(self.test_metrics, outputs, trainer, "test")
 
+    def on_train_epoch_start(
+        self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"
+    ) -> None:
+        self.state["epoch"] += 1
+
+    def on_test_epoch_start(
+        self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"
+    ) -> None:
+        self.state["epoch"] += 1
+
     def on_train_epoch_end(
         self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"
     ) -> None:
@@ -432,9 +440,6 @@ class MetricsCallback(pl.Callback):
         metrics: MetricCollection,
         trainer: pl.Trainer,
     ):
-
-        self.state["epoch"] += 1
-
         metrics_dict = {}
         confusion_matrix_key = None
         confusion_matrix = None
