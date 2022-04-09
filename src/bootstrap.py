@@ -79,7 +79,7 @@ def bootstrap(
     export_path=EXPORT_PATH,
     seed_no=SEED_NO,
     trainer_factory: TrainerFactory = TrainerFactory(),
-    trainer_kwargs: Dict[str, Any]
+    trainer_kwargs: Dict[str, Any] = {}
 ):
     export_path.mkdir(exist_ok=True, parents=True)
     image_folder_path.mkdir(exist_ok=True, parents=True)
