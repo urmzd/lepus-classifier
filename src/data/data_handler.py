@@ -3,13 +3,12 @@ from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Type
-from typing_extensions import TypedDict
 
 import numpy as np
 import plotly.express as px
 import pytorch_lightning as pl
 import torch
-from loguru import logger
+import wandb
 from pytorch_lightning.loops.base import Loop
 from pytorch_lightning.loops.fit_loop import FitLoop
 from pytorch_lightning.trainer.states import TrainerFn
@@ -28,12 +27,11 @@ from torchmetrics import (
     Precision,
     Recall,
 )
+from typing_extensions import TypedDict
 
-import wandb
 from src.data.data_extractor import (
     download_image_from_link,
     extract_path_from_link,
-    get_image,
     get_data,
     get_image,
 )
@@ -207,7 +205,7 @@ class StratifiedKFoldLoop(Loop):
 
     def on_run_start(self, *args: Any, **kwargs: Any) -> None:
         assert isinstance(self.trainer.datamodule, StratifiedKFoldDataModule)
-        self.lighning_module_state_dict = deepcopy(
+        self.lightning_module_state_dict = deepcopy(
             self.trainer.lightning_module.state_dict()
         )
 

@@ -3,7 +3,6 @@ from typing import Callable, List, NewType, Tuple
 
 import numpy as np
 from pipetools.main import Pipe
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 
 Image = NewType("Image", np.ndarray)
 Label = NewType("Label", str)

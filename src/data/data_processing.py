@@ -3,7 +3,7 @@ from functools import partial
 import cv2
 import numpy as np
 from pipetools import pipe
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+from sklearn.preprocessing import LabelEncoder
 
 from src.data.data_types import FeaturesEncoder, Image, Label, TargetEncoder
 

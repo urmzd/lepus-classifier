@@ -16,7 +16,7 @@ from src.data.data_handler import (
 from src.data.data_processing import get_image_encoder
 
 LOG_LEVEL = "INFO"
-DATA_MANFIEST_PATH = Path("./resources/data.csv")
+DATA_MANIFEST_PATH = Path("./resources/data.csv")
 IMAGE_FOLDER_PATH = Path("/tmp/images")
 HEIGHT = 200
 WIDTH = 200
@@ -67,7 +67,7 @@ class TrainerFactory:
 def bootstrap(
     model=BasicModel(learning_rate=LEARNING_RATE),
     log_level=LOG_LEVEL,
-    data_manfiest_path=DATA_MANFIEST_PATH,
+    data_manifest_path=DATA_MANIFEST_PATH,
     image_folder_path=IMAGE_FOLDER_PATH,
     height=HEIGHT,
     width=WIDTH,
@@ -95,7 +95,7 @@ def bootstrap(
     )
 
     datamodule = LepusStratifiedKFoldDataModule(
-        data_manifest_path=data_manfiest_path,
+        data_manifest_path=data_manifest_path,
         image_folder_path=image_folder_path,
         transform_features=x_encoder,
         batch_size=batch_size,

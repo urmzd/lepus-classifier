@@ -20,7 +20,7 @@ def get_data(data_path: Path) -> pd.DataFrame:
 @lru_cache()
 def extract_path_from_link(link: str, image_folder_path: Path) -> Path:
     """Extract the image path from the specified link."""
-    file_name_regex = re.compile(r".*\/(.*\.(jpeg|jpg|png)?)\??", flags=re.IGNORECASE)
+    file_name_regex = re.compile(r".*/(.*\.(jpeg|jpg|png)?)\??", flags=re.IGNORECASE)
     regex_matches = file_name_regex.match(link)
 
     if not regex_matches:
