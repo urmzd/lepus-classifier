@@ -108,11 +108,16 @@ def bootstrap(
     )
 
     trainer = trainer_factory.get_trainer(logger_kwargs, trainer_kwargs)
+    wandb_logger = trainer_factory.logger
+
+    wandb_logger.watch(model, log_freq=50)
 
     internal_fit_loop = trainer.fit_loop
     trainer.fit_loop = StratifiedKFoldLoop(num_folds, export_path=export_path)
     trainer.fit_loop.connect(internal_fit_loop)
     trainer.fit(model, datamodule)
+
+    wandb_logger.unwatch(model)
 
     wandb.finish()
 

@@ -335,6 +335,7 @@ class MetricsState(TypedDict):
 
 
 class MetricState(TypedDict):
+    fold: int
     epoch: int
 
 
@@ -348,9 +349,9 @@ class MetricsCallback(pl.Callback):
             ConfusionMatrix(num_classes=n_targets),
         )
 
-        self.train_metrics = metrics.clone(prefix="train_")
-        self.val_metrics = metrics.clone(prefix="val_")
-        self.test_metrics = metrics.clone(prefix="test_")
+        self.train_metrics = metrics.clone(prefix="train/")
+        self.val_metrics = metrics.clone(prefix="val/")
+        self.test_metrics = metrics.clone(prefix="test/")
         self.state: MetricState = {"fold": 0, "epoch": 0}
 
     def load_state_dict(self, state_dict: MetricState) -> None:
@@ -497,7 +498,7 @@ class MetricsCallback(pl.Callback):
                 "global_step": trainer.global_step,
                 "epoch": self.state["epoch"],
                 "fold": self.state["fold"],
-                f"{stage}_loss": loss,
+                f"{stage}/loss": loss,
                 **metric_dict,
             }
         )
