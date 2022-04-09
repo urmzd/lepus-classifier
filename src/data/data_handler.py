@@ -226,7 +226,7 @@ class StratifiedKFoldLoop(Loop):
         self.trainer.save_checkpoint(
             self.export_path / f"model.fold-{self.current_fold}.pt"
         )
-        self.trainer.lightning_module.load_state_dict(self.lighning_module_state_dict)
+        self.trainer.lightning_module.load_state_dict(self.lightning_module_state_dict)
         self.trainer.strategy.setup_optimizers(self.trainer)
         self.replace(fit_loop=FitLoop)
 
