@@ -117,11 +117,7 @@ def bootstrap(
     trainer.fit_loop.connect(internal_fit_loop)
     trainer.fit(model, datamodule)
 
-    wandb_logger.unwatch(model)
-
     wandb.finish()
-
-
 
 if __name__ == "__main__":
     bootstrap()
