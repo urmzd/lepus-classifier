@@ -110,7 +110,7 @@ class LepusStratifiedKFoldDataModule(StratifiedKFoldDataModule):
         if self.n_splits >= 2:
             splitter = StratifiedKFold(self.n_splits)
         else:
-            splitter = StratifiedShuffleSplit(1, test_size=0.8)
+            splitter = StratifiedShuffleSplit(1, train_size=self.train_size)
 
         self.splits = [split for split in splitter.split(features, targets)]
 
@@ -410,8 +410,9 @@ class MetricsCallback(pl.Callback):
     ) -> None:
         self._log_metric_on_batch(self.test_metrics, outputs, trainer, "test")
 
-
-    def on_train_epoch_start(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule") -> None:
+    def on_train_epoch_start(
+        self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"
+    ) -> None:
         self.state["epoch"] += 1
 
     def on_train_epoch_end(
