@@ -110,7 +110,7 @@ class LepusStratifiedKFoldDataModule(StratifiedKFoldDataModule):
         if self.n_splits >= 2:
             splitter = StratifiedKFold(self.n_splits)
         else:
-            splitter = StratifiedShuffleSplit(1, train_size=self.train_size)
+            splitter = StratifiedShuffleSplit(1, train_split=self.train_size)
 
         self.splits = [split for split in splitter.split(features, targets)]
 

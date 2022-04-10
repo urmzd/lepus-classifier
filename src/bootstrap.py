@@ -15,6 +15,7 @@ from src.data.data_handler import (
     StratifiedKFoldLoop,
 )
 from src.data.data_processing import get_image_encoder
+import pytorch_lightning.strategies as strategies
 
 LOG_LEVEL = "INFO"
 DATA_MANIFEST_PATH = Path("./resources/data.csv")
@@ -40,7 +41,7 @@ def get_default_callbacks() -> List[Callback]:
 class TrainerFactory:
     logger: Optional[WandbLogger] = None
     callbacks: List[Callback] = field(default_factory=get_default_callbacks)
-    strategy: str = "ddp"
+    strategy: Optional[Union[str, strategies.Strategy]] = "dp",
     max_epochs: int = 10
     devices: Union[List[int], str, None] = "auto"
     deterministic: bool = True
