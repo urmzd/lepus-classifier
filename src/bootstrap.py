@@ -47,8 +47,12 @@ class TrainerFactory:
     project_name = PROJECT_NAME
     run_name: Optional[str] = RUN_NAME
 
-    def get_trainer(self, logger_kwargs: Dict[str, Any], trainer_kwargs: Dict[str, Any]):
-        self.logger = WandbLogger(project=PROJECT_NAME, log_model="all", **logger_kwargs)
+    def get_trainer(
+        self, logger_kwargs: Dict[str, Any], trainer_kwargs: Dict[str, Any]
+    ):
+        self.logger = WandbLogger(
+            project=PROJECT_NAME, log_model="all", **logger_kwargs
+        )
         trainer = Trainer(
             max_epochs=self.max_epochs,
             limit_train_batches=None,
@@ -80,8 +84,8 @@ def bootstrap(
     export_path=EXPORT_PATH,
     seed_no=SEED_NO,
     trainer_factory: TrainerFactory = TrainerFactory(),
-    logger_kwargs: Dict[str, Any] = {},
-    trainer_kwargs: Dict[str, Any] = {}
+    logger_kwargs: Dict[str, Any] = dict(),
+    trainer_kwargs: Dict[str, Any] = dict(),
 ):
     export_path.mkdir(exist_ok=True, parents=True)
     image_folder_path.mkdir(exist_ok=True, parents=True)
@@ -118,6 +122,7 @@ def bootstrap(
     trainer.fit(model, datamodule)
 
     wandb.finish()
+
 
 if __name__ == "__main__":
     bootstrap()
