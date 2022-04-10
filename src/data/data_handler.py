@@ -306,37 +306,9 @@ class BaseModel(pl.LightningModule, ABC):
         return torch.optim.Adam(self.parameters(), lr=self.learning_rate)
 
 
-class BasicModel(BaseModel):
-    def __init__(self, n_targets=2, learning_rate=0.02) -> None:
-        super().__init__(n_targets=n_targets, learning_rate=learning_rate)
-
-        self.layer_1 = torch.nn.Conv2d(1, 15, 2, 2)
-        self.layer_2 = torch.nn.MaxPool2d(2, 2)
-        self.layer_3 = torch.nn.ReLU()
-        self.layer_4 = torch.nn.Flatten(1, -1)
-        self.layer_5 = torch.nn.Linear(15 * 50 * 50, n_targets)
-        self.softmax_layer = torch.nn.LogSoftmax()
-
-        super().__post_init__()
-
-    def forward(self, x):
-        x_1 = self.layer_1(x)
-        x_2 = self.layer_2(x_1)
-        x_3 = self.layer_3(x_2)
-        x_4 = self.layer_4(x_3)
-        x_5 = self.layer_5(x_4)
-        result = self.softmax_layer(x_5)
-        return result
-
-
-class MetricsState(TypedDict):
-    epochs: int
-    n_batches: int
-
-
 class MetricState(TypedDict):
+    epochs: int
     fold: int
-    epoch: int
 
 
 class MetricsCallback(pl.Callback):
