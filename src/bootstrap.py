@@ -9,7 +9,6 @@ from loguru import logger
 from pytorch_lightning import Callback, Trainer, seed_everything
 from pytorch_lightning.loggers import WandbLogger
 from src.data.data_handler import (
-    BasicModel,
     LepusStratifiedKFoldDataModule,
     MetricsCallback,
     StratifiedKFoldLoop,
