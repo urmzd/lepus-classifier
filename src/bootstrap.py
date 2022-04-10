@@ -3,12 +3,14 @@ from dataclasses import dataclass, field
 from functools import partial
 from pathlib import Path
 from typing import List, Optional, Union, Any, Dict
+import torch
 import wandb
 
 from loguru import logger
 from pytorch_lightning import Callback, Trainer, seed_everything
 from pytorch_lightning.loggers import WandbLogger
 from src.data.data_handler import (
+    BaseModel,
     LepusStratifiedKFoldDataModule,
     MetricsCallback,
     StratifiedKFoldLoop,
