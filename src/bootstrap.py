@@ -26,13 +26,13 @@ HEIGHT = 200
 WIDTH = 200
 SCALE_HEIGHT = False
 BATCH_SIZE = 2
-NUM_FOLDS = 5
+NUM_FOLDS = 3
 EXPORT_PATH = Path("model_checkpoints")
-LEARNING_RATE = 0.02
+LEARNING_RATE = 1e-5
 N_CLASSES = 2
 SEED_NO: Optional[int] = 42
 PROJECT_NAME = "rabbit-classifier"
-RUN_NAME = None
+RUN_NAME = "BasicModel"
 
 
 def get_default_callbacks() -> List[Callback]:
