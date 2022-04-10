@@ -182,8 +182,8 @@ class EnsembleVotingModel(pl.LightningModule):
             [model_cls.load_from_checkpoint(p) for p in checkpoint_paths]
         )
 
-    def forward(self, x):
-        return x
+    def forward(self, *args, **kwargs):
+        return args
 
     def test_step(self, batch: Any, dataloader_idx: int = 0) -> StepOutputDict:
         logits = torch.stack([m(batch[0]) for m in self.models]).mean(0)
