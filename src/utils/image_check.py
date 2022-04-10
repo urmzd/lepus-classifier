@@ -1,16 +1,19 @@
 #!/usr/bin/env python
 
-from data_retrieval import download_image, get_data
+from pathlib import Path
+
 from difPy import dif
 
-DATA_PATH = "../resources/data.csv"
-IMAGE_PATH = "/tmp/images"
+from src.data.data_extractor import download_image_from_link, get_data
+
+DATA_PATH = Path("../resources/data.csv")
+IMAGE_PATH = Path("/tmp/images")
 
 if __name__ == "__main__":
     df = get_data(DATA_PATH)
 
     for link in df.iloc[:, 1].tolist():
-        download_image(link, IMAGE_PATH)
+        download_image_from_link(link, IMAGE_PATH)
 
     search = dif("/tmp/images")
 
