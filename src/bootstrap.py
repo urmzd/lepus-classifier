@@ -2,21 +2,18 @@ import sys
 from dataclasses import dataclass, field
 from functools import partial
 from pathlib import Path
-from typing import List, Optional, Union, Any, Dict
-import torch
-import wandb
+from typing import Any, Dict, List, Optional, Union
 
+import pytorch_lightning.strategies as strategies
+import torch
 from loguru import logger
 from pytorch_lightning import Callback, Trainer, seed_everything
 from pytorch_lightning.loggers import WandbLogger
-from src.data.data_handler import (
-    BaseModel,
-    LepusStratifiedKFoldDataModule,
-    MetricsCallback,
-    StratifiedKFoldLoop,
-)
+
+import wandb
+from src.data.data_handler import (BaseModel, LepusStratifiedKFoldDataModule,
+                                   MetricsCallback, StratifiedKFoldLoop)
 from src.data.data_processing import get_image_encoder
-import pytorch_lightning.strategies as strategies
 
 LOG_LEVEL = "INFO"
 DATA_MANIFEST_PATH = Path("./resources/data.csv")
