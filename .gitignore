@@ -20,5 +20,6 @@
 !.github/**/*
 !pyproject.toml
 wandb/**/*
+!assets/**/*
 
 !requirements/*.txt
