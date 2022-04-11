@@ -12,6 +12,11 @@ using a relatively small set of images retrieved online.
 - [Proposals](#proposals)
 - [Report](#report)
 - [Poster](#poster)
+- [Interactive Notebooks](#interactive-notebooks)
+
+## Interactive Notebooks
+
+All interactie notebooks, including experiments done can be found under the [notebooks folder](/notebooks/).
 
 ## Data
 
@@ -24,6 +29,10 @@ All the initial proposals can be found under [resources/proposals](docs/proposal
 ## Report
 
 The final report can be found under [docs/report-docs/lepus-classifier.pdf](docs/report-docs/lepus-classifier_report.pdf)
+
+## Poster
+
+The final project poster can be found under [docs/poster.pdf](docs/poster.pdf)
 
 ## Quickstart
 
