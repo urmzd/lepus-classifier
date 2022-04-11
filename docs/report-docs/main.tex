@@ -223,7 +223,7 @@ Small and unbalanced data sets, such as ours, often result in models that poorly
 \subsubsection{Stratified Sampling}
 Stratified sampling is a sampling method in which each selected batch of inputs shares the same percentage of selected entities across all classes. In other words, stratified sampling ensures that a class will have contributed to the learning process during the fitting stage \cite{scikit-learn}.
 
-\subsubsection{K Fold Cross Validation}
+\subsubsection{K-Fold Cross Validation}
 K-fold cross-validation is a fitting strategy that breaks the data set into $K$ even subsets, where one subset is left out (the validation set) and, the remaining subsets are utilized during training. With each fold iteration, a new subset is left out until all subsets have been used during validation. The prime advantage of this strategy over a typical train-test split is that it ensures that all training data is used \cite{scikit-learn}. As networks with more data typically outperform networks with large amounts of data, it is essential that as much data as possible is retained during fitting.
 
 \subsubsection{Analysis}
