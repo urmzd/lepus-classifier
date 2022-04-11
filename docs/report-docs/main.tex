@@ -64,7 +64,7 @@
 
 \maketitle
 \begin{abstract}
-  State-of-the-art image classifiers are typically training on hundreds of thousands of images and require extensive computing power. In this report, we examine methods to improve performance on a CNN without the need for large data sets and specialized hardware. Using 85 images of two species from the Lepus genus, we demonstrate that optimal image classifier architectures are still limited by the quantity of data they are trained with, especially when images have highly complex feature sets.
+  State-of-the-art image classifiers are typically training on hundreds of thousands of images and require extensive computing power. In this report, we examine methods to improve performance of a CNN without the need for large data sets and specialized hardware. Using 85 images of two species from the Lepus genus, we demonstrate that optimal image classifier architectures are still limited by the quantity of data they are trained with, especially when images have highly complex feature sets.
 
 \end{abstract}
 
@@ -82,12 +82,12 @@ Artificial Neural Networks (ANN) are a type of computation model designed to rep
 \centerline{$a = \phi(\sum_{j} w_{j}x_{j} + b)$ \cite{grosse2019lecture03}}
 \newline
 
-To build an ANN, we organize a corresponding sequence of artificial neurons. They operate in parallel to map an input \emph{X} to a linear, or non-linear function output \cite{https://doi.org/10.1002/cpe.6767,seger2018investigation}. The neurons are organized into a series of interconnected layers to produce a function mapping with input \emph{X} to an output \emph{Y}. Each layer passes the result of the activation function applied to its input onto the next layer until it reaches the output layer as shown in \ref{fig:my_label} below.
+To build an ANN, we organize a corresponding sequence of artificial neurons. They operate in parallel to map an input \emph{X} to a linear, or non-linear function output \cite{https://doi.org/10.1002/cpe.6767,seger2018investigation}. The neurons are organized into a series of interconnected layers to produce a function mapping with input \emph{X} to an output \emph{Y}. Each layer passes the result of the activation function applied to its input onto the next layer until it reaches the output layer as shown in Figure \ref{fig:my_label} below.
 
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=0.75]{NN_figure.png}
-    \caption{Simple Neural Network Architecture, adapted from \cite{https://doi.org/10.1002/cpe.6767}}
+    \caption{Simple Neural Network Architecture. Adapted from \cite{https://doi.org/10.1002/cpe.6767}}
     \label{fig:my_label}
 \end{figure}
 
@@ -105,8 +105,7 @@ Mathematically, a simple neural network with two hidden layers can be represente
 
 
 \subsection{Convolutional Neural Networks}
-CNNs are a commonly employed deep learning architecture, particularly in computer vision applications, that use the mathematical convolution operations in its layers \cite{grosse2019lecture09}. Traditional CNN architectures comprise of a input layer and one or more convolution and pooling layers followed by dense layers through to the output layer \cite{amidi_amidi}. 
-Convolution layers apply mathematical convolution operations paired with a non-linear activation function to facilitate feature detection from an input signal \cite{grosse2019lecture09}. The layer hyperparameters include filter size (or kernel) and stride length \cite{amidi_amidi}. The resulting layer output is a feature map.  The activations for convolutional layers are computed where the feature maps, \emph{z}, are the sum of input \emph{x} convoluted by an input-output specific filter \emph{w}, with an element-wise activation function, $\phi$, applied as in the equations below. In contrast to dense layers, convolution layers are sparsely connected and employ weight sharing. Effectively reducing the number of necessary weights and connections for improved computation efficiency \cite{grosse2019lecture09}. 
+CNNs are a commonly employed deep learning architecture, particularly in computer vision applications, that use the mathematical convolution operations in its layers \cite{grosse2019lecture09}. Traditional CNN architectures comprise of an input layer and one or more convolution and pooling layers followed by dense layers through to the output layer \cite{amidi_amidi}. Convolution layers apply mathematical convolution operations paired with a non-linear activation function to facilitate feature detection from an input signal \cite{grosse2019lecture09}. The layer hyperparameters include filter size (or kernel) and stride length \cite{amidi_amidi}. The resulting layer output is a feature map.  The activations for convolutional layers are computed where the feature maps, \emph{z}, are the sum of input \emph{x} convoluted by an input-output specific filter \emph{w}, with an element-wise activation function, $\phi$, applied as in the equations below. In contrast to dense layers, convolution layers are sparsely connected and employ weight sharing. Effectively reducing the number of necessary weights and connections for improved computation efficiency \cite{grosse2019lecture09}.
 \newline
 \newline
 \centerline{$z_{i} = \phi^{^(^1^)}(\sum_{j} x_{j}*w_j)$}
@@ -133,9 +132,9 @@ The hyperbolic tangent function, Tanh, shown below, is another type of Sigmoid f
 \newline
 
 The ReLU (Rectified Linear Unit) function, shown below, is frequently used because of the simplicity of its implementation and gradients allow for easy optimization and reduced computation requirements \cite{lederer2021activation,Goodfellow-et-al-2016}. It is highly similar to a linear unit, however, the rectification zeros the output for half the domain, keeping gradients consistently large upon activation \cite{Goodfellow-et-al-2016}. This activation has its own form of a vanishing-gradient problem where many units may be inactive during training, which is especially detrimental when dealing with high complexity models \cite{lederer2021activation}.
-
 \newline
 \newline
+\medskip
 \centerline{$ReLU(z) = max(0,z)$ \cite{lederer2021activation}}
 \newline
 
@@ -222,13 +221,13 @@ To receive valuable results from our experimentation, we first had to develop a 
 Small and unbalanced data sets, such as ours, often result in models that poorly fit the input, have selection bias or both. As a result, it was deemed necessary to find alternative sampling and training strategies to prevent the fore-mentioned problems.
 
 \subsubsection{Stratified Sampling}
-Stratified sampling is a sampling method in which each selected batch of inputs shares the same percentage of selected entities across all classes. In other words, stratified sampling ensures that a class will have contributed to the learning process during the fitting stage.
+Stratified sampling is a sampling method in which each selected batch of inputs shares the same percentage of selected entities across all classes. In other words, stratified sampling ensures that a class will have contributed to the learning process during the fitting stage \cite{scikit-learn}.
 
 \subsubsection{K Fold Cross Validation}
-K-fold cross-validation is a fitting strategy that breaks the data set into $K$ even subsets, where one subset is left out (the validation set) and, the remaining subsets are utilized during training. With each fold iteration, a new subset is left out until all subsets have been used during validation. The prime advantage of this strategy over a typical train-test split is that it ensures that all training data is used. As networks with more data typically outperform networks with large amounts of data, it is essential that as much data as possible is retained during fitting.
+K-fold cross-validation is a fitting strategy that breaks the data set into $K$ even subsets, where one subset is left out (the validation set) and, the remaining subsets are utilized during training. With each fold iteration, a new subset is left out until all subsets have been used during validation. The prime advantage of this strategy over a typical train-test split is that it ensures that all training data is used \cite{scikit-learn}. As networks with more data typically outperform networks with large amounts of data, it is essential that as much data as possible is retained during fitting.
 
 \subsubsection{Analysis}
-The use of k-fold cross-validation offers better performance than a typical train-test split strategy. As demonstrated in table \ref{table:kfold}, as the numbers of folds approached 3, the metrics improved. It should be noted that K-Fold/1 is treated as the baseline and consists of using the \emph{StratifiedShuffleSplit} module with a training/validation ratio of 80:20 \cite{scikit-learn}. This is likely because an insufficient number of folds can result in the unbalanced class being absent during training, whereas an abundance of folds results in the unbalanced class not having enough samples provided during training.
+The use of k-fold cross-validation offers better performance than a typical train-test split strategy. As demonstrated in Table \ref{table:kfold}, as the numbers of folds approached 3, the metrics improved. It should be noted that K-Fold/1 is treated as the baseline and consists of using the \emph{StratifiedShuffleSplit} module with a training/validation ratio of 80:20 \cite{scikit-learn}. This is likely because an insufficient number of folds can result in the unbalanced class being absent during training, whereas an abundance of folds results in the unbalanced class not having enough samples provided during training.
 
 
 \subsection{Batch Size}
@@ -238,17 +237,17 @@ The results of these experiments are shown in Table \ref{table:batch} in Appendi
 
 \subsection{Optimizers}
 
-While all of the optimizers achieved similar performance, as seen in table \href{table:optim}, the SGD optimizer with momentum was able to generalize the model better. Likely due to the initial small learning rate, using an adaptive optimizer resulted in training to slow down significantly. In the process, the models could probably not derive adequate information from each batch.
+While all of the optimizers achieved similar performance, as seen in Table \ref{table:optim}, the SGD optimizer with momentum was able to generalize the model better. Likely due to the initial small learning rate, using an adaptive optimizer resulted in training to slow down significantly. In the process, the models could probably not derive adequate information from each batch.
 
 \subsection{Dropout}
 
 Our baseline model showed a divergence between training and validation accuracy over a certain number of steps per fold. While the training accuracy would trend upwards towards 1, the validation accuracy would plateau and eventually decrease. This is due to the model learning the noise in the training image data, which led to poor generalization across the validation and testing datasets. To mitigate this effect, we increased the drop rate. We expanded the number of dropout layers throughout several experiments to observe its regularizing impact on the model’s metrics. Dropout regularization could make the model more robust through the random dropping of layer outputs (controlled by a drop rate hyperparameter). This effectively simulates the combining of several neural nets and reduces the co-adaptation between nodes that do not generalize \cite{JMLR:v15:srivastava14a}. 
 
-In our first two experimental models, as displayed in table \ref{table:drop}, we increased the drop rate of our dropout layer from the baseline of 0.2 to 0.4 (Drop01) and then to 0.5 (Drop02). Across these three models, we saw an explainable decrease in training accuracy, from 0.91 to 0.89 and then 0.82, due to the model’s shrinking capacity to memorize information in the training dataset. Of these three models, we noted a maximum validation accuracy of 0.77 for Drop02, which possessed a drop rate of 0.5, a commonly used value. We also added an additional dropout layer after the second convolution layer (Drop03) to continue this trend. However, for this model, the training accuracy and validation accuracy both dropped to 0.65 and 0.69, respectively. Though the gap between these two values had reduced, the information loss from the dropout layers reduced the model’s capacity to label the image data accurately.
+In our first two experimental models, as displayed in Table \ref{table:drop}, we increased the drop rate of our dropout layer from the baseline of 0.2 to 0.4 (Drop01) and then to 0.5 (Drop02). Across these three models, we saw an explainable decrease in training accuracy, from 0.91 to 0.89 and then 0.82, due to the model’s shrinking capacity to memorize information in the training dataset. Of these three models, we noted a maximum validation accuracy of 0.77 for Drop02, which possessed a drop rate of 0.5, a commonly used value. We also added an additional dropout layer after the second convolution layer (Drop03) to continue this trend. However, for this model, the training accuracy and validation accuracy both dropped to 0.65 and 0.69, respectively. Though the gap between these two values had reduced, the information loss from the dropout layers reduced the model’s capacity to label the image data accurately.
 
 \subsection{Pooling}
 
-For this experiment, we wanted to examine the impact of average pooling layers on the accuracy of the model, in comparison to the max pooling layers utilized in the baseline model. The outcome of the average pooling model (Pool01), visible in table \ref{table:pool}, was a significant decrease in training accuracy in comparison to the baseline model (from 0.91 to 0.69) but also a significant increase in validation accuracy (from 0.69 to 0.85). The test accuracy remained barely impacted, dropping from 0.53 to 0.47. This is indicative that the average pooling model generalized better from the training data to the validation data than the max pooling baseline model. We believe that this was due to the max-pooling model highlighting features that were irrelevant to the classification of the image, such as bright elements in the background, leading to the memorization of the training set. The more greater representation of all elements in the model through average pooling may have led to this increase in validation accuracy.
+For this experiment, we wanted to examine the impact of average pooling layers on the accuracy of the model, in comparison to the max pooling layers utilized in the baseline model. The outcome of the average pooling model (Pool01), visible in Table \ref{table:pool}, was a significant decrease in training accuracy in comparison to the baseline model (from 0.91 to 0.69) but also a significant increase in validation accuracy (from 0.69 to 0.85). The test accuracy remained barely impacted, dropping from 0.53 to 0.47. This is indicative that the average pooling model generalized better from the training data to the validation data than the max pooling baseline model. We believe that this was due to the max-pooling model highlighting features that were irrelevant to the classification of the image, such as bright elements in the background, leading to the memorization of the training set. The more greater representation of all elements in the model through average pooling may have led to this increase in validation accuracy.
 
 \subsection{Convolutions}
 
@@ -336,22 +335,23 @@ Baseline & 0.02           & 0.588235      & 0.582456     & 0.585714       & 0.58
 \end{table}
 
 \begin{table}[h!]
-\caption{Experimental Results: Optimizer}
-\label{table:optim}
-\begin{tabular}{@{}lllllll@{}}
-\toprule
-Name    & learning\_rate & momentum & test/Accuracy & test/F1Score & test/Precision & test/Recall \\ \midrule
-Adam    & 0.00001        &          & 0.411765      & 0.291667     & 0.233333       & 0.388889    \\
-RMSprop & 0.00001        &          & 0.411765      & 0.291667     & 0.233333       & 0.388889    \\
-SGD     & 0.00001        & 0.99     & 0.470588      & 0.463158     & 0.464286       & 0.465278    \\
-AdaGrad & 0.00001        &          & 0.470588      & 0.32         & 0.25           & 0.444444  \\ 
-\bottomrule
-\end{tabular}
+    \centering
+    \caption{Experimental results for optimizer}
+    \label{table:optim}
+    \begin{tabular}{lllllll}
+        \toprule
+            Name    & learning\_rate & momentum & test/Accuracy & test/F1Score & test/Precision & test/Recall \\ \midrule
+            Adam    & 0.00001        &          & 0.411765      & 0.291667     & 0.233333       & 0.388889    \\
+            RMSprop & 0.00001        &          & 0.411765      & 0.291667     & 0.233333       & 0.388889    \\
+            SGD     & 0.00001        & 0.99     & 0.470588      & 0.463158     & 0.464286       & 0.465278    \\
+            AdaGrad & 0.00001        &          & 0.470588      & 0.32         & 0.25           & 0.444444  \\ 
+        \bottomrule
+    \end{tabular}
 \end{table}
 
 \begin{table}[h!]
     \centering    
-    \caption{Experimental results for dropout experiments}
+    \caption{Experimental results for dropout}
     \label{table:drop}
     \begin{tabular}{llll}
         \toprule
