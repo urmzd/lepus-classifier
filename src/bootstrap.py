@@ -11,12 +11,8 @@ from pytorch_lightning import Callback, Trainer, seed_everything
 from pytorch_lightning.loggers import WandbLogger
 
 import wandb
-from src.data.data_handler import (
-    BaseModel,
-    LepusStratifiedKFoldDataModule,
-    MetricsCallback,
-    StratifiedKFoldLoop,
-)
+from src.data.data_handler import (BaseModel, LepusStratifiedKFoldDataModule,
+                                   MetricsCallback, StratifiedKFoldLoop)
 from src.data.data_processing import get_image_encoder
 
 LOG_LEVEL = "INFO"
@@ -54,21 +50,23 @@ class TrainerFactory:
         self, logger_kwargs: Dict[str, Any], trainer_kwargs: Dict[str, Any]
     ):
         self.logger = WandbLogger(
-            project=PROJECT_NAME, log_model="all", **logger_kwargs
+            **dict(project=PROJECT_NAME, log_model="all", **logger_kwargs)
         )
         trainer = Trainer(
-            max_epochs=self.max_epochs,
-            limit_train_batches=None,
-            limit_val_batches=None,
-            limit_test_batches=None,
-            num_sanity_val_steps=0,
-            devices=self.devices,
-            accelerator="auto",
-            strategy=self.strategy,
-            logger=self.logger,
-            callbacks=self.callbacks,
-            deterministic=self.deterministic,
-            **trainer_kwargs
+            **dict(
+                max_epochs=self.max_epochs,
+                limit_train_batches=None,
+                limit_val_batches=None,
+                limit_test_batches=None,
+                num_sanity_val_steps=0,
+                devices=self.devices,
+                accelerator="auto",
+                strategy=self.strategy,
+                logger=self.logger,
+                callbacks=self.callbacks,
+                deterministic=self.deterministic,
+                **trainer_kwargs
+            )
         )
         return trainer
 
