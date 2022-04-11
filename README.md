@@ -73,3 +73,12 @@ All interactie notebooks, including experiments done can be found under the [not
 ## Experiment Tracking and Logs
 
 Our experimental logs can be found at our [Weights & Biases project](https://wandb.ai/csci-4155-rabbit-classifier).
+
+## Dependencies
+
+All dependencies can be installed using the following snippet:
+
+```bash
+pip install -r requirements.txt
+```
+
