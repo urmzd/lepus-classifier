@@ -12,30 +12,18 @@ from loguru import logger
 from pytorch_lightning.loops.base import Loop
 from pytorch_lightning.loops.fit_loop import FitLoop
 from pytorch_lightning.trainer.states import TrainerFn
-from sklearn.model_selection import (
-    StratifiedKFold,
-    StratifiedShuffleSplit,
-    train_test_split,
-)
+from sklearn.model_selection import (StratifiedKFold, StratifiedShuffleSplit,
+                                     train_test_split)
 from torch.nn import functional as F
 from torch.utils.data import DataLoader, Dataset
-from torchmetrics import (
-    Accuracy,
-    ConfusionMatrix,
-    F1Score,
-    MetricCollection,
-    Precision,
-    Recall,
-)
+from torchmetrics import (Accuracy, ConfusionMatrix, F1Score, MetricCollection,
+                          Precision, Recall)
 from typing_extensions import TypedDict
 
 import wandb
-from src.data.data_extractor import (
-    download_image_from_link,
-    extract_path_from_link,
-    get_data,
-    get_image,
-)
+from src.data.data_extractor import (download_image_from_link,
+                                     extract_path_from_link, get_data,
+                                     get_image)
 from src.data.data_processing import get_target_encoder
 from src.data.data_types import FeaturesEncoder, TargetEncoder
 
