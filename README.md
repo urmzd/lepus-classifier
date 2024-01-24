@@ -68,7 +68,7 @@ Data was retrieved and can be found under [resources/data.txt](resources/data.tx
 
 ## Interactive Notebooks
 
-All interactie notebooks, including experiments done can be found under the [notebooks folder](/notebooks/).
+All interactive notebooks, including experiments done can be found under the [notebooks folder](/notebooks/).
 
 ## Experiment Tracking and Logs
 
