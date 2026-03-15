@@ -19,6 +19,7 @@
 !scripts/**/*
 !.github/**/*
 !pyproject.toml
+!.urmzd.sr.yml
 wandb/**/*
 !assets/**/*
 

@@ -1,84 +1,67 @@
 # Lepus Classifier
 
-<img src="./assets/mascot.webp" alt="mascot" width="200" style="float:left">
+<img src="./assets/mascot.webp" alt="mascot" width="200">
 
-> State-of-the-art image classifiers are typically training on hundreds of thousands of images and require extensive computing power. In this report, we examine methods to improve performance of a CNN without the need for large data sets and specialized hardware. Using 85 images of two species from the Lepus genus, we demonstrate that optimal image classifier architectures are still limited by the quantity of data they are trained with, especially when images have highly complex feature sets.
-
-## Table of Contents
-
-- [Quickstart](#quickstart)
-- [Proposals](#proposals)
-- [Report](#report)
-- [Poster](#poster)
-- [Data](#data)
-- [Interactive Notebooks](#interactive-notebooks)
-- [Experiment Tracking & Logs](#experiement-tracking-and-logs)
+A CNN-based image classifier that distinguishes between two rabbit species (*Lepus* genus) using only ~85 training images. Built to explore how well small datasets can work with modern deep learning techniques.
 
 ## Quickstart
 
-1. Install dependencies.
-
-```bash
-  pip install -r requirements.txt
-```
-
-2. Login to your Weights and Biases account using your API key.
-
-```bash
-  wandb login
-```
-
-3. Use the bootstrap function to start training your custom model.
-
-```python
-import src.bootstrap import bootstrap
-
-class CustomModel(BaseModel):
-  def __init__(self):
-    super().__init__()
-    self.layers = torch.nn.Sequential(
-      ...
-    )
-    super().__post_init__()
-
-  def forward(self, x)
-
-bootstrap(model=CustomModel())
-```
-
-### Google Collab
-
-Take a look at [notebooks/example_bootstrap.ipynb](notebooks/example_bootstrap.ipynb)
-
-## Proposals
-
-All the initial proposals can be found under [resources/proposals](docs/proposals/).
-
-## Report
-
-The final report can be found under [docs/report-docs/lepus-classifier.pdf](docs/report-docs/lepus-classifier_report.pdf)
-
-## Poster
-
-The final project poster can be found under [docs/poster.pdf](docs/poster.pdf)
-
-## Data
-
-Data was retrieved and can be found under [resources/data.txt](resources/data.txt)
-
-## Interactive Notebooks
-
-All interactive notebooks, including experiments done can be found under the [notebooks folder](/notebooks/).
-
-## Experiment Tracking and Logs
-
-Our experimental logs can be found at our [Weights & Biases project](https://wandb.ai/csci-4155-rabbit-classifier).
-
-## Dependencies
-
-All dependencies can be installed using the following snippet:
+1. Install dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
+2. Login to [Weights & Biases](https://wandb.ai) for experiment tracking:
+
+```bash
+wandb login
+```
+
+3. Train a model:
+
+```python
+from src.bootstrap import bootstrap
+
+bootstrap()
+```
+
+Or define a custom architecture:
+
+```python
+from src.bootstrap import bootstrap
+from src.data.model import BaseModel
+import torch
+
+class CustomModel(BaseModel):
+    def __init__(self):
+        super().__init__()
+        self.layers = torch.nn.Sequential(...)
+        super().__post_init__()
+
+    def forward(self, x):
+        return self.layers(x)
+
+bootstrap(model=CustomModel())
+```
+
+See [notebooks/example_bootstrap.ipynb](notebooks/example_bootstrap.ipynb) for a Google Colab example.
+
+## Project Structure
+
+| Path | Description |
+|------|-------------|
+| [`src/`](src/) | Training pipeline, data loading, and model definitions |
+| [`notebooks/`](notebooks/) | Experiment notebooks and usage examples |
+| [`resources/data.csv`](resources/data.csv) | Dataset manifest (image URLs and labels) |
+| [`docs/report-docs/lepus-classifier-report.pdf`](docs/report-docs/lepus-classifier-report.pdf) | Final research report |
+| [`docs/poster.pdf`](docs/poster.pdf) | Project poster |
+| [`docs/proposals/`](docs/proposals/) | Initial project proposals |
+
+## Experiment Logs
+
+Tracked with Weights & Biases: [csci-4155-rabbit-classifier](https://wandb.ai/csci-4155-rabbit-classifier)
+
+## License
+
+[Apache 2.0](LICENSE)

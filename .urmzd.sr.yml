@@ -1,0 +1,43 @@
+branches:
+- main
+- master
+tag_prefix: v
+commit_pattern: ^(?P<type>\w+)(?:\((?P<scope>[^)]+)\))?(?P<breaking>!)?:\s+(?P<description>.+)
+breaking_section: Breaking Changes
+misc_section: Miscellaneous
+types:
+- name: feat
+  bump: minor
+  section: Features
+- name: fix
+  bump: patch
+  section: Bug Fixes
+- name: perf
+  bump: patch
+  section: Performance
+- name: docs
+  section: Documentation
+- name: refactor
+  section: Refactoring
+- name: revert
+  section: Reverts
+- name: chore
+- name: ci
+- name: test
+- name: build
+- name: style
+changelog:
+  file: null
+  template: null
+version_files: []
+version_files_strict: false
+artifacts: []
+floating_tags: false
+build_command: null
+stage_files: []
+prerelease: null
+pre_release_command: null
+post_release_command: null
+sign_tags: false
+draft: false
+release_name_template: null
