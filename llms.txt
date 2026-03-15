@@ -1,0 +1,20 @@
+# Lepus Classifier
+
+> A CNN-based image classifier that distinguishes between two rabbit species (Lepus genus) using only ~85 training images. Built with PyTorch Lightning, stratified K-fold cross-validation, ensemble voting, and Weights & Biases experiment tracking to explore how well small datasets work with modern deep learning techniques.
+
+## Docs
+
+- [README](https://github.com/urmzd/lepus-classifier/blob/main/README.md): Installation, usage, and examples
+- [AGENTS.md](https://github.com/urmzd/lepus-classifier/blob/main/AGENTS.md): Architecture and development guide
+
+## API / Key Files
+
+- [src/bootstrap.py](https://github.com/urmzd/lepus-classifier/blob/main/src/bootstrap.py): Entry point and default BasicModel CNN
+- [src/data/data_handler.py](https://github.com/urmzd/lepus-classifier/blob/main/src/data/data_handler.py): Data modules, K-fold loop, base model, ensemble, metrics
+- [src/data/data_processing.py](https://github.com/urmzd/lepus-classifier/blob/main/src/data/data_processing.py): Image and label preprocessing
+- [resources/data.csv](https://github.com/urmzd/lepus-classifier/blob/main/resources/data.csv): Dataset manifest
+
+## Optional
+
+- [CONTRIBUTING](https://github.com/urmzd/lepus-classifier/blob/main/CONTRIBUTING.md): How to contribute
+- [Skill](https://github.com/urmzd/lepus-classifier/blob/main/skills/lepus-classifier/SKILL.md): Agent skill

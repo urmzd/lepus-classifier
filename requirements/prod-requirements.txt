@@ -56,7 +56,8 @@ pyDeprecate==0.3.2
 pylint==2.13.4
 pyparsing==3.0.7
 python-dateutil==2.8.2
-pytorch-lightning==1.6.0
+lightning>=2.0
+lightning-kfold @ git+https://github.com/urmzd/lightning-kfold.git
 pytz==2022.1
 PyWavelets==1.3.0
 PyYAML==6.0

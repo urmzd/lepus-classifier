@@ -4,15 +4,16 @@ from functools import partial
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
-import pytorch_lightning.strategies as strategies
+import lightning as L
+import lightning.pytorch.strategies as strategies
 import torch
+from lightning.pytorch.loggers import WandbLogger
+from lightning_kfold import KFoldTrainer
 from loguru import logger
-from pytorch_lightning import Callback, Trainer, seed_everything
-from pytorch_lightning.loggers import WandbLogger
+from torch.nn import functional as F
 
 import wandb
-from src.data.data_handler import (BaseModel, LepusStratifiedKFoldDataModule,
-                                   MetricsCallback, StratifiedKFoldLoop)
+from src.data.data_handler import BaseModel, LepusStratifiedKFoldDataModule, MetricsCallback
 from src.data.data_processing import get_image_encoder
 
 LOG_LEVEL = "INFO"
@@ -31,14 +32,14 @@ PROJECT_NAME = "rabbit-classifier"
 RUN_NAME = "BasicModel"
 
 
-def get_default_callbacks() -> List[Callback]:
+def get_default_callbacks() -> List[L.Callback]:
     return [MetricsCallback(n_targets=N_CLASSES)]
 
 
 @dataclass
 class TrainerFactory:
     logger: Optional[WandbLogger] = None
-    callbacks: List[Callback] = field(default_factory=get_default_callbacks)
+    callbacks: List[L.Callback] = field(default_factory=get_default_callbacks)
     strategy: Optional[Union[str, strategies.Strategy]] = "single_device"
     max_epochs: int = 10
     devices: Union[List[int], str, None] = "auto"
@@ -46,29 +47,26 @@ class TrainerFactory:
     project_name = PROJECT_NAME
     run_name: Optional[str] = RUN_NAME
 
-    def get_trainer(
+    def get_trainer_kwargs(
         self, logger_kwargs: Dict[str, Any], trainer_kwargs: Dict[str, Any]
-    ):
+    ) -> Dict[str, Any]:
         self.logger = WandbLogger(
             **dict(project=PROJECT_NAME, log_model="all", **logger_kwargs)
         )
-        trainer = Trainer(
-            **dict(
-                max_epochs=self.max_epochs,
-                limit_train_batches=None,
-                limit_val_batches=None,
-                limit_test_batches=None,
-                num_sanity_val_steps=0,
-                devices=self.devices,
-                accelerator="auto",
-                strategy=self.strategy,
-                logger=self.logger,
-                callbacks=self.callbacks,
-                deterministic=self.deterministic,
-                **trainer_kwargs
-            )
+        return dict(
+            max_epochs=self.max_epochs,
+            limit_train_batches=None,
+            limit_val_batches=None,
+            limit_test_batches=None,
+            num_sanity_val_steps=0,
+            devices=self.devices,
+            accelerator="auto",
+            strategy=self.strategy,
+            logger=self.logger,
+            callbacks=self.callbacks,
+            deterministic=self.deterministic,
+            **trainer_kwargs,
         )
-        return trainer
 
 
 class BasicModel(BaseModel):
@@ -115,7 +113,7 @@ def bootstrap(
     image_folder_path.mkdir(exist_ok=True, parents=True)
 
     if seed_no:
-        seed_everything(seed_no, workers=True)
+        L.seed_everything(seed_no, workers=True)
 
     # System logger.
     logger.remove()
@@ -132,18 +130,21 @@ def bootstrap(
         image_folder_path=image_folder_path,
         transform_features=x_encoder,
         batch_size=batch_size,
-        n_splits=num_folds,
+        num_folds=num_folds,
     )
 
-    trainer = trainer_factory.get_trainer(logger_kwargs, trainer_kwargs)
+    lt_trainer_kwargs = trainer_factory.get_trainer_kwargs(logger_kwargs, trainer_kwargs)
     wandb_logger = trainer_factory.logger
 
     wandb_logger.watch(model, log_freq=50)
 
-    internal_fit_loop = trainer.fit_loop
-    trainer.fit_loop = StratifiedKFoldLoop(num_folds, export_path=export_path)
-    trainer.fit_loop.connect(internal_fit_loop)
-    trainer.fit(model, datamodule)
+    kfold_trainer = KFoldTrainer(
+        num_folds=num_folds,
+        export_path=export_path,
+        loss_fn=F.nll_loss,
+        **lt_trainer_kwargs,
+    )
+    kfold_trainer.fit(model, datamodule)
 
     wandb.finish()
 

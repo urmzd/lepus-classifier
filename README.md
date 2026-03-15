@@ -1,10 +1,23 @@
-# Lepus Classifier
+<p align="center">
+  <h1 align="center">Lepus Classifier</h1>
+  <p align="center">
+    A CNN-based image classifier that distinguishes between two rabbit species using only ~85 training images.
+    <br /><br />
+    <a href="https://github.com/urmzd/lepus-classifier/releases">Install</a>
+    &middot;
+    <a href="https://github.com/urmzd/lepus-classifier/issues">Report Bug</a>
+    &middot;
+    <a href="https://github.com/urmzd/lepus-classifier/blob/main/README.md">Research Report</a>
+  </p>
+</p>
+
+<p align="center">
+  <a href="https://github.com/urmzd/lepus-classifier/actions/workflows/ci.yml"><img src="https://github.com/urmzd/lepus-classifier/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+</p>
 
 <img src="./assets/mascot.webp" alt="mascot" width="200">
 
-A CNN-based image classifier that distinguishes between two rabbit species (*Lepus* genus) using only ~85 training images. Built to explore how well small datasets can work with modern deep learning techniques.
-
-## Quickstart
+## Quick Start
 
 1. Install dependencies:
 
@@ -61,6 +74,12 @@ See [notebooks/example_bootstrap.ipynb](notebooks/example_bootstrap.ipynb) for a
 ## Experiment Logs
 
 Tracked with Weights & Biases: [csci-4155-rabbit-classifier](https://wandb.ai/csci-4155-rabbit-classifier)
+
+## Agent Skill
+
+```bash
+npx skills add urmzd/lepus-classifier
+```
 
 ## License
 
