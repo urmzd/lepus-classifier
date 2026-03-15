@@ -1,26 +1,17 @@
-# Ignore everything.
-*
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+venv/
+.venv/
 
-# Except directories
-!*/
+# Jupyter
+.ipynb_checkpoints/
 
-# Except for these files
-!.gitignore
-!**/*.pdf
-!**/*.tex
-!**/*.bib
-!**/*.md
-!**/*.png
-!**/*.py
-!**/*.ipynb
-!Dockerfile
-!resources/**/*
-!requirements.txt
-!scripts/**/*
-!.github/**/*
-!pyproject.toml
-!.urmzd.sr.yml
-wandb/**/*
-!assets/**/*
+# Weights & Biases
+wandb/
 
-!requirements/*.txt
+# OS
+.DS_Store
