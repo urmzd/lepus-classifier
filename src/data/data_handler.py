@@ -159,11 +159,11 @@ class MetricState(TypedDict):
 class MetricsCallback(L.Callback):
     def __init__(self, n_targets=2, accuracy_average="micro", default_average="macro"):
         metrics = MetricCollection(
-            Accuracy(num_classes=n_targets, average=accuracy_average),
-            Precision(num_classes=n_targets, average=default_average),
-            F1Score(num_classes=n_targets, average=default_average),
-            Recall(num_classes=n_targets, average=default_average),
-            ConfusionMatrix(num_classes=n_targets),
+            Accuracy(task="multiclass", num_classes=n_targets, average=accuracy_average),
+            Precision(task="multiclass", num_classes=n_targets, average=default_average),
+            F1Score(task="multiclass", num_classes=n_targets, average=default_average),
+            Recall(task="multiclass", num_classes=n_targets, average=default_average),
+            ConfusionMatrix(task="multiclass", num_classes=n_targets),
         )
 
         self.train_metrics = metrics.clone(prefix="train/")

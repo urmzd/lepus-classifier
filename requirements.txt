@@ -1,2 +1,0 @@
--r requirements/prod-requirements.txt
--r requirements/dev-requirements.txt

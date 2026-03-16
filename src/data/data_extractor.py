@@ -4,7 +4,6 @@ from pathlib import Path
 
 import cv2
 import pandas as pd
-import requests
 
 from src.data.data_types import Image
 
@@ -37,20 +36,12 @@ def extract_path_from_link(link: str, image_folder_path: Path) -> Path:
 
 
 def download_image_from_link(link: str, image_folder_path: Path) -> Path:
+    """Return the local path for an image. Images are expected to already exist locally."""
     file_path = extract_path_from_link(link, image_folder_path)
-
-    if file_path.exists():
-        return file_path
-
-    image_request_headers = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"
-    }
-
-    image = requests.get(link, headers=image_request_headers)
-
-    with open(file_path, "wb") as handle:
-        handle.write(image.content)
-
+    if not file_path.exists():
+        raise FileNotFoundError(
+            f"Image not found at {file_path}. Run 'python scripts/download_images.py' first."
+        )
     return file_path
 
 

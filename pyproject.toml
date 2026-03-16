@@ -1,5 +1,29 @@
-[tool.pylint.messages_control]
-disable = "C0330, C0326"
+[project]
+name = "lepus-classifier"
+version = "1.0.0"
+description = "CNN classifier for rabbit species (Lepus genus) — Dalhousie University CSCI 4155/6505 course project."
+readme = "README.md"
+license = "Apache-2.0"
+authors = [
+    { name = "Urmzd Mukhammadnaim", email = "hello@urmzd.com" },
+]
+requires-python = ">=3.12"
+dependencies = [
+    "torch>=2.2",
+    "lightning>=2.2",
+    "lightning-kfold>=0.1.0",
+    "torchmetrics>=1.0",
+    "wandb>=0.16",
+    "opencv-python>=4.9",
+    "pandas>=2.0",
+    "numpy>=1.26",
+    "scikit-learn>=1.4",
+    "loguru>=0.7",
+    "pipetools>=1.1",
+    "Pillow>=10.0",
+    "plotly>=5.0",
+]
 
-[tool.pylint.format]
-max-line-length = "88"
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

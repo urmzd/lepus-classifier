@@ -78,7 +78,7 @@ class BasicModel(BaseModel):
         self.layer_3 = torch.nn.ReLU()
         self.layer_4 = torch.nn.Flatten(1, -1)
         self.layer_5 = torch.nn.Linear(15 * 50 * 50, n_targets)
-        self.softmax_layer = torch.nn.LogSoftmax()
+        self.softmax_layer = torch.nn.LogSoftmax(dim=1)
 
         super().__post_init__()
 

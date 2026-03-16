@@ -15,3 +15,6 @@ wandb/
 
 # OS
 .DS_Store
+
+# Downloaded images (run scripts/download_images.py to fetch)
+resources/images/
