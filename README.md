@@ -1,3 +1,5 @@
+> **Archived.** This was a group project / final assessment for [CSCI 4155/6505 — Machine Learning](https://web.cs.dal.ca/~tt/CSCI415512/) at Dalhousie University, part of the [Artificial Intelligence & Intelligent Systems certificate](https://www.dal.ca/faculty/computerscience/undergraduate-programs/program-planning/certificates.html) (undergraduate/graduate mixed course). It is no longer actively maintained. Note: this project was built on PyTorch Lightning, which has since been superseded by [Lightning](https://github.com/Lightning-AI/pytorch-lightning).
+
 <p align="center">
   <h1 align="center">Lepus Classifier</h1>
   <p align="center">
